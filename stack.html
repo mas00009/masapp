@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A0C0F">
+<title>The Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0C0F; --card:#13171D; --card-hi:#171C23;
+    --line:rgba(255,255,255,0.07);
+    --ink:#EDF0F3; --ink-2:#98A1AB; --ink-3:#5C6570; --rail:#222831;
+    --h-morning:#F4B860; --h-lunch:#EE9A58; --h-train:#E5736A;
+    --h-dinner:#7E9BD4; --h-wind:#9180DC; --h-night:#6E78C4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    background:
+      radial-gradient(120% 60% at 50% -10%, rgba(244,184,96,0.06), transparent 55%),
+      radial-gradient(120% 70% at 50% 110%, rgba(110,120,196,0.07), transparent 55%),
+      var(--bg);
+    color:var(--ink); font-family:'Inter',-apple-system,system-ui,sans-serif;
+    line-height:1.3; -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding:max(12px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));
+  }
+  .wrap{ max-width:520px; margin:0 auto; }
+
+  /* Header */
+  header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .title-wrap{ display:flex; align-items:baseline; gap:9px; }
+  h1{ font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:700; letter-spacing:-0.02em; }
+  .clock{ font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--ink-2); }
+  .progress{ display:flex; align-items:center; gap:8px; }
+  .ptext{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-2); white-space:nowrap; }
+  .progress-track{ width:46px; height:4px; border-radius:99px; background:var(--rail); overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; border-radius:99px;
+    background:linear-gradient(90deg,var(--h-morning),var(--h-train),var(--h-night)); transition:width .4s ease; }
+
+  /* Timeline */
+  .timeline{ position:relative; padding-left:24px; }
+  .timeline::before{ content:""; position:absolute; left:5px; top:6px; bottom:6px; width:2px;
+    background:linear-gradient(180deg,var(--h-morning) 0%,var(--h-lunch) 20%,var(--h-train) 38%,
+      var(--h-dinner) 62%,var(--h-wind) 84%,var(--h-night) 100%); opacity:.5; }
+
+  .phase{ position:relative; padding-bottom:11px; }
+  .phase:last-child{ padding-bottom:0; }
+  .node{ position:absolute; left:-24px; top:3px; width:14px; height:14px; border-radius:50%;
+    background:var(--bg); border:2px solid var(--accent); display:grid; place-items:center; }
+  .node::after{ content:""; width:5px; height:5px; border-radius:50%; background:var(--accent);
+    box-shadow:0 0 9px var(--accent); }
+  .phase.active .node{ box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+
+  .phase-head{ display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  .time{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--accent); }
+  .phase-name{ font-size:11px; color:var(--ink-3); font-weight:500; }
+  .now-tag{ font-family:'JetBrains Mono',monospace; font-size:8.5px; font-weight:600; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--bg); background:var(--accent); padding:2px 6px; border-radius:4px; line-height:1; }
+
+  /* Items: single dense row */
+  .items{ display:flex; flex-direction:column; gap:4px; }
+  .item{ display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:7px 10px; transition:background .2s,opacity .25s;
+    -webkit-tap-highlight-color:transparent; }
+  .item:active{ background:var(--card-hi); }
+  .check{ flex:0 0 auto; width:17px; height:17px; border-radius:5px; border:1.5px solid var(--rail);
+    background:transparent; cursor:pointer; position:relative; transition:border-color .2s,background .2s; }
+  .check svg{ position:absolute; inset:0; margin:auto; width:10px; height:10px; stroke:var(--bg);
+    stroke-width:3.4; fill:none; opacity:0; transition:opacity .15s; }
+  .check:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .name{ font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; letter-spacing:-0.01em;
+    color:var(--ink); flex:0 0 auto; }
+  .with{ font-size:11px; color:var(--ink-3); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dose{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 13%, transparent); padding:2px 7px; border-radius:6px;
+    white-space:nowrap; flex:0 0 auto; }
+
+  .item.done{ opacity:.45; }
+  .item.done .name{ color:var(--ink-2); text-decoration:line-through; text-decoration-color:var(--ink-3); }
+  .check.on{ background:var(--accent); border-color:var(--accent); }
+  .check.on svg{ opacity:1; }
+
+  footer{ display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
+  .reset{ background:none; border:1px solid var(--line); color:var(--ink-3);
+    font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase;
+    padding:5px 10px; border-radius:7px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .reset:active{ color:var(--ink); }
+  .datestamp{ font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--ink-3); }
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-wrap"><h1>The Stack</h1><span class="clock" id="clock">--:--</span></div>
+    <div class="progress">
+      <span class="ptext" id="ptext">0/12</span>
+      <span class="progress-track"><span class="progress-fill" id="pfill"></span></span>
+    </div>
+  </header>
+
+  <div class="timeline" id="timeline">
+
+    <section class="phase" data-start="6" style="--accent:var(--h-morning)">
+      <span class="node"></span>
+      <div class="phase-head"><span class="time">07:00–08:00</span><span class="phase-name">Morning</span></div>
+      <div class="items">
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Vitamin D</span><span class="with">breakfast + fat · every 2nd day</span><span class="dose">1 cap</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Ubiquinol</span><span class="with">breakfast · CoQ10</span><span class="dose">150 mg</span></div>
+      </div>
+    </section>
+
+    <section class="phase" data-start="11.5" style="--accent:var(--h-lunch)">
+      <span class="node"></span>
+      <div class="phase-head"><span class="time">12:00</span><span class="phase-name">Lunch</span></div>
+      <div class="items">
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Theracurmin Triple</span><span class="with">with lunch</span><span class="dose">1 cap</span></div>
+      </div>
+    </section>
+
+    <section class="phase" data-start="12.5" style="--accent:var(--h-train)">
+      <span class="node"></span>
+      <div class="phase-head"><span class="time">13:00</span><span class="phase-name">~60 min pre-training</span></div>
+      <div class="items">
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Collagen Peptides</span><span class="with">water / shake · tendons</span><span class="dose">10 g</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Multivitamin</span><span class="with">with collagen · vit C</span><span class="dose">1 tab</span></div>
+      </div>
+    </section>
+
+    <section class="phase" data-start="17" style="--accent:var(--h-dinner)">
+      <span class="node"></span>
+      <div class="phase-head"><span class="time">DINNER</span><span class="phase-name">Evening meal</span></div>
+      <div class="items">
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Fish Oil</span><span class="with">with dinner</span><span class="dose">2 caps</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Glucosamine 1500</span><span class="with">with dinner</span><span class="dose">1 tab</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Tart Cherry</span><span class="with">with dinner · recovery</span><span class="dose">1 cap</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Creatine</span><span class="with">water / shake</span><span class="dose">5 g</span></div>
+      </div>
+    </section>
+
+    <section class="phase" data-start="21.5" style="--accent:var(--h-wind)">
+      <span class="node"></span>
+      <div class="phase-head"><span class="time">30–60 MIN</span><span class="phase-name">Before bed</span></div>
+      <div class="items">
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Magnesium Glycinate</span><span class="with">water · sleep</span><span class="dose">400 mg</span></div>
+      </div>
+    </section>
+
+    <section class="phase" data-start="22.5" style="--accent:var(--h-night)">
+      <span class="node"></span>
+      <div class="phase-head"><span class="time">LIGHTS OUT</span><span class="phase-name">Before bed</span></div>
+      <div class="items">
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Regaine 5% Foam</span><span class="with">dry scalp · overnight</span><span class="dose">½ capful</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <button class="reset" id="reset">Reset day</button>
+    <span class="datestamp" id="datestamp"></span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var STORAGE = 'stack-' + new Date().toISOString().slice(0,10);
+  var checks = Array.prototype.slice.call(document.querySelectorAll('.check'));
+  var total = checks.length;
+  checks.forEach(function(c,i){ c.dataset.idx = i; });
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(STORAGE)||'[]'); }catch(e){ return []; } }
+  function save(a){ try{ localStorage.setItem(STORAGE, JSON.stringify(a)); }catch(e){} }
+
+  var state = {};
+  load().forEach(function(i){ state[i]=true; });
+
+  function apply(c){
+    var on = !!state[c.dataset.idx];
+    c.classList.toggle('on', on);
+    c.closest('.item').classList.toggle('done', on);
+    c.setAttribute('aria-pressed', on?'true':'false');
+  }
+  function refresh(){
+    var done = Object.keys(state).filter(function(k){return state[k];}).length;
+    document.getElementById('ptext').textContent = done+'/'+total;
+    document.getElementById('pfill').style.width = (done/total*100)+'%';
+  }
+  checks.forEach(function(c){
+    apply(c);
+    c.addEventListener('click', function(){
+      state[c.dataset.idx] = !state[c.dataset.idx];
+      apply(c);
+      save(Object.keys(state).filter(function(k){return state[k];}).map(Number));
+      refresh();
+    });
+  });
+  refresh();
+
+  document.getElementById('reset').addEventListener('click', function(){
+    state={}; checks.forEach(apply); save([]); refresh();
+  });
+
+  var phases = Array.prototype.slice.call(document.querySelectorAll('.phase'));
+  function tick(){
+    var now=new Date(), h=now.getHours(), m=now.getMinutes();
+    document.getElementById('clock').textContent = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+    var cur=h+m/60, ai=0;
+    phases.forEach(function(p,i){ if(cur>=parseFloat(p.dataset.start)) ai=i; });
+    var before = cur < parseFloat(phases[0].dataset.start);
+    phases.forEach(function(p,i){
+      var on = !before && i===ai;
+      p.classList.toggle('active', on);
+      var head=p.querySelector('.phase-head'), ex=head.querySelector('.now-tag');
+      if(on && !ex){ var t=document.createElement('span'); t.className='now-tag'; t.textContent='Now'; head.appendChild(t); }
+      else if(!on && ex){ ex.remove(); }
+    });
+  }
+  tick(); setInterval(tick,30000);
+  document.getElementById('datestamp').textContent =
+    new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
+})();
+</script>
+</body>
+</html>
