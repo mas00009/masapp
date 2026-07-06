@@ -44,8 +44,8 @@
   /* Timeline */
   .timeline{ position:relative; padding-left:24px; }
   .timeline::before{ content:""; position:absolute; left:5px; top:6px; bottom:6px; width:2px;
-    background:linear-gradient(180deg,var(--h-morning) 0%,var(--h-lunch) 20%,var(--h-train) 38%,
-      var(--h-dinner) 62%,var(--h-wind) 84%,var(--h-night) 100%); opacity:.5; }
+    background:linear-gradient(180deg,var(--h-morning) 0%,var(--h-morning) 40%,
+      var(--h-wind) 100%); opacity:.5; }
 
   .phase{ position:relative; padding-bottom:11px; }
   .phase:last-child{ padding-bottom:0; }
@@ -100,7 +100,7 @@
   <header>
     <div class="title-wrap"><h1>The Stack</h1><span class="clock" id="clock">--:--</span></div>
     <div class="progress">
-      <span class="ptext" id="ptext">0/12</span>
+      <span class="ptext" id="ptext">0/10</span>
       <span class="progress-track"><span class="progress-fill" id="pfill"></span></span>
     </div>
   </header>
@@ -113,34 +113,9 @@
       <div class="items">
         <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Vitamin D</span><span class="with">breakfast + fat · every 2nd day</span><span class="dose">1 cap</span></div>
         <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Ubiquinol</span><span class="with">breakfast · CoQ10</span><span class="dose">150 mg</span></div>
-      </div>
-    </section>
-
-    <section class="phase" data-start="11.5" style="--accent:var(--h-lunch)">
-      <span class="node"></span>
-      <div class="phase-head"><span class="time">12:00</span><span class="phase-name">Lunch</span></div>
-      <div class="items">
-        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Theracurmin Triple</span><span class="with">with lunch</span><span class="dose">1 cap</span></div>
-      </div>
-    </section>
-
-    <section class="phase" data-start="12.5" style="--accent:var(--h-train)">
-      <span class="node"></span>
-      <div class="phase-head"><span class="time">13:00</span><span class="phase-name">~60 min pre-training</span></div>
-      <div class="items">
-        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Collagen Peptides</span><span class="with">water / shake · tendons</span><span class="dose">10 g</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Collagen Peptides</span><span class="with">with multivitamin · tendons</span><span class="dose">10 g</span></div>
         <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Multivitamin</span><span class="with">with collagen · vit C</span><span class="dose">1 tab</span></div>
-      </div>
-    </section>
-
-    <section class="phase" data-start="17" style="--accent:var(--h-dinner)">
-      <span class="node"></span>
-      <div class="phase-head"><span class="time">DINNER</span><span class="phase-name">Evening meal</span></div>
-      <div class="items">
-        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Fish Oil</span><span class="with">with dinner</span><span class="dose">2 caps</span></div>
-        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Glucosamine 1500</span><span class="with">with dinner</span><span class="dose">1 tab</span></div>
-        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Tart Cherry</span><span class="with">with dinner · recovery</span><span class="dose">1 cap</span></div>
-        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Creatine</span><span class="with">water / shake</span><span class="dose">5 g</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Theracurmin Triple</span><span class="with">with breakfast</span><span class="dose">1 cap</span></div>
       </div>
     </section>
 
@@ -148,15 +123,11 @@
       <span class="node"></span>
       <div class="phase-head"><span class="time">30–60 MIN</span><span class="phase-name">Before bed</span></div>
       <div class="items">
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Fish Oil</span><span class="with">with food if you can</span><span class="dose">2 caps</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Glucosamine 1500</span><span class="with">easier with food</span><span class="dose">1 tab</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Tart Cherry</span><span class="with">recovery</span><span class="dose">1 cap</span></div>
+        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Creatine</span><span class="with">water / shake</span><span class="dose">5 g</span></div>
         <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Magnesium Glycinate</span><span class="with">water · sleep</span><span class="dose">400 mg</span></div>
-      </div>
-    </section>
-
-    <section class="phase" data-start="22.5" style="--accent:var(--h-night)">
-      <span class="node"></span>
-      <div class="phase-head"><span class="time">LIGHTS OUT</span><span class="phase-name">Before bed</span></div>
-      <div class="items">
-        <div class="item"><button class="check" aria-label="Mark taken"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></button><span class="name">Regaine 5% Foam</span><span class="with">dry scalp · overnight</span><span class="dose">½ capful</span></div>
       </div>
     </section>
 
