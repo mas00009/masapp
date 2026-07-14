@@ -298,11 +298,9 @@
   .hheat-c.train{background:var(--protein);box-shadow:0 0 7px color-mix(in srgb,var(--protein) 55%,transparent)}
   .hheat-c.prot{background:var(--carbs);box-shadow:0 0 7px color-mix(in srgb,var(--carbs) 55%,transparent)}
   .hheat-c.supp{background:var(--blue);box-shadow:0 0 7px color-mix(in srgb,var(--blue) 55%,transparent)}
-  .hbackup{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 12px;margin-top:auto}
+  .hbackup{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 12px;margin-top:auto;flex:none}
   .hbackup-txt{flex:1;min-width:0;font-family:var(--ff-num);font-size:10.5px;color:var(--muted);line-height:1.45}
   .hbackup-btn{flex:none;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);color:var(--text);font-family:var(--ff-ui);font-weight:700;font-size:12px;padding:8px 12px;cursor:pointer;white-space:nowrap}
-  .hbackup-btn:active{background:var(--border)}
-
   .hbackup-btn:active{background:var(--border)}
 
   /* stack editor */
@@ -539,7 +537,7 @@
   #tab-lift .exc-hist:active{color:var(--blue)}
 
   /* home dashboard */
-  #tab-home.active{display:flex;flex-direction:column;min-height:calc(100dvh - 72px - env(safe-area-inset-bottom))}
+  #tab-home.active{display:flex;flex-direction:column;gap:8px;min-height:calc(100dvh - 72px - env(safe-area-inset-bottom))}
   #tab-home .home-brand{display:flex;align-items:center;gap:10px;margin:2px 2px 10px;padding-top:calc(4px + env(safe-area-inset-top));flex:none}
   #tab-home .brand-logo{height:32px;width:auto;display:block;mix-blend-mode:screen}
   #tab-home .brand-word{height:10px;width:auto;display:block;mix-blend-mode:screen;align-self:flex-end;margin-bottom:3px}
@@ -549,7 +547,7 @@
   #tab-home .brand-div{width:1px;height:16px;background:var(--faint);opacity:.55;flex:none}
   /* hero ring */
   #tab-home{--brand:#1E90F5}
-  #tab-home .hero{position:relative;background:linear-gradient(165deg,#191C26 0%,#101219 100%);border:1px solid var(--border);border-radius:20px;padding:18px 16px;margin-bottom:8px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:1;display:flex;flex-direction:column;justify-content:center;min-height:200px}
+  #tab-home .hero{position:relative;background:linear-gradient(165deg,#191C26 0%,#101219 100%);border:1px solid var(--border);border-radius:20px;padding:18px 16px;margin-bottom:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:1;display:flex;flex-direction:column;justify-content:center;min-height:200px}
   #tab-home .hero::before{content:"";position:absolute;top:-42%;left:50%;transform:translateX(-50%);width:360px;height:360px;background:radial-gradient(circle,rgba(30,144,245,.20),transparent 66%);pointer-events:none}
   #tab-home .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:34%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);pointer-events:none}
   #tab-home .hero:active{transform:scale(.995)}
@@ -580,7 +578,7 @@
   #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums}
   #tab-home .mring-l{font-size:10.5px;color:var(--muted);letter-spacing:.02em;font-weight:600;min-width:46px}
   /* training card */
-  #tab-home .htrain{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s,border-color .15s;margin-bottom:8px;flex:none}
+  #tab-home .htrain{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s,border-color .15s;margin-bottom:0;flex:none}
   #tab-home .htrain:active{transform:scale(.99);border-color:var(--faint)}
   #tab-home .htrain-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
   #tab-home .htrain-head svg{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round}
