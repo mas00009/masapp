@@ -1152,6 +1152,16 @@
     </div>
     <input type="file" id="importFile" accept="application/json,.json" style="display:none">
     <div class="mono-note" id="backupNote" style="text-align:left;margin:8px 6px 0">Saves everything (food, workouts, body, schedule, supps, water) to a file you can keep or move to a new phone. Your API key is not included.</div>
+    <div class="subhead" style="margin-top:18px">Cloud sync (Cloudflare)</div>
+    <div class="field" style="margin:0 4px 10px"><label>Worker URL</label><input type="text" id="syncUrl" placeholder="https://your-worker.workers.dev" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    <div class="field" style="margin:0 4px 10px"><label>Sync token</label><input type="password" id="syncToken" placeholder="your secret token" autocomplete="off"></div>
+    <button class="ghost" id="saveSync">Save sync settings</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 4px 0">
+      <button class="ghost" id="syncPush" style="margin-top:0">Push to cloud</button>
+      <button class="ghost" id="syncPull" style="margin-top:0">Pull from cloud</button>
+    </div>
+    <label for="syncAuto" style="display:flex;align-items:center;gap:8px;margin:12px 6px 0;font-size:13px;color:var(--muted)"><input type="checkbox" id="syncAuto" style="width:auto;margin:0"> Auto-sync (push changes, pull on open)</label>
+    <div class="mono-note" id="syncNote" style="text-align:left;margin:8px 6px 0">Syncs food, body, workouts, schedule, supps, water and photos to your Cloudflare Worker. URL and token are stored only in this browser and are not synced.</div>
 
     <div class="subhead" style="margin-top:18px">Your foods</div>
     <div id="manageList"></div>
@@ -3101,6 +3111,95 @@
   tick(); setInterval(tick,30000);
   document.getElementById('datestamp').textContent=
     new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
+})();
+</script>
+<script>
+/* ---------- Cloudflare cloud sync (self-contained) ---------- */
+(function(){
+  var URL_K="mt_syncurl", TOK_K="mt_synctoken", AUTO_K="mt_syncauto";
+  var EXCLUDE={ "mt_aikey":1, "mt_syncurl":1, "mt_synctoken":1, "mt_syncauto":1 };
+  var lastHash=null, timer=null;
+  function ls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function gather(){
+    var o={};
+    try{ for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(!k||EXCLUDE[k]) continue;
+      if(k.indexOf("mt_")===0||k.indexOf("stack-")===0) o[k]=localStorage.getItem(k); } }catch(e){}
+    return o;
+  }
+  function snap(){ return JSON.stringify(gather()); }
+  function cfg(){ var u=ls(URL_K), t=ls(TOK_K); return (u&&t)?{url:u.replace(/\/+$/,""),tok:t}:null; }
+  function note(m){ var n=document.getElementById("syncNote"); if(n) n.textContent=m; }
+  function hdr(c){ return {"Content-Type":"application/json","Authorization":"Bearer "+c.tok}; }
+
+  function applyAndReload(obj){
+    try{ for(var k in obj){ if(Object.prototype.hasOwnProperty.call(obj,k)) localStorage.setItem(k,obj[k]); } }catch(e){}
+    location.reload();
+  }
+
+  async function push(silent){
+    var c=cfg(); if(!c){ if(!silent) note("Enter Worker URL and token, then Save."); return false; }
+    try{
+      var r=await fetch(c.url+"/data",{method:"POST",headers:hdr(c),body:snap()});
+      if(!r.ok){ if(!silent) note("Push failed ("+r.status+"). Check URL/token."); return false; }
+      lastHash=snap(); if(!silent) note("Pushed to cloud \u00b7 "+new Date().toLocaleTimeString()); return true;
+    }catch(e){ if(!silent) note("Push error: "+e.message); return false; }
+  }
+  async function pull(silent){
+    var c=cfg(); if(!c){ if(!silent) note("Enter Worker URL and token, then Save."); return; }
+    try{
+      var r=await fetch(c.url+"/data",{headers:{ "Authorization":"Bearer "+c.tok }});
+      if(!r.ok){ if(!silent) note("Pull failed ("+r.status+"). Check URL/token."); return; }
+      var txt=await r.text(), obj=null; try{ obj=JSON.parse(txt); }catch(e){}
+      if(!obj||typeof obj!=="object"){ if(!silent) note("Cloud is empty \u2014 Push first."); return; }
+      var incoming=JSON.stringify(obj);
+      if(incoming===snap()){ lastHash=incoming; if(!silent) note("Already up to date."); return; }
+      applyAndReload(obj);
+    }catch(e){ if(!silent) note("Pull error: "+e.message); }
+  }
+
+  function startAuto(){
+    if(timer) return;
+    timer=setInterval(function(){
+      if(ls(AUTO_K)!=="1"||!cfg()) return;
+      var cur=snap(); if(cur!==lastHash) push(true);
+    }, 8000);
+  }
+  async function autoOpen(){
+    if(ls(AUTO_K)!=="1"||!cfg()) return;
+    var c=cfg();
+    try{
+      var r=await fetch(c.url+"/data",{headers:{ "Authorization":"Bearer "+c.tok }});
+      if(!r.ok) return;
+      var txt=await r.text(), obj=null; try{ obj=JSON.parse(txt); }catch(e){}
+      if(!obj||typeof obj!=="object"){ await push(true); return; }  // seed empty cloud
+      var incoming=JSON.stringify(obj);
+      if(incoming===snap()){ lastHash=incoming; return; }
+      applyAndReload(obj);
+    }catch(e){}
+  }
+
+  function init(){
+    var u=document.getElementById("syncUrl"), t=document.getElementById("syncToken"),
+        a=document.getElementById("syncAuto");
+    if(u) u.value=ls(URL_K)||"";
+    if(t) t.value=ls(TOK_K)||"";
+    if(a) a.checked=(ls(AUTO_K)==="1");
+    lastHash=snap();
+    var save=document.getElementById("saveSync");
+    if(save) save.addEventListener("click",function(){
+      try{
+        localStorage.setItem(URL_K,(u.value||"").trim());
+        localStorage.setItem(TOK_K,(t.value||"").trim());
+      }catch(e){}
+      note("Sync settings saved.");
+    });
+    var pb=document.getElementById("syncPush"); if(pb) pb.addEventListener("click",function(){ push(false); });
+    var pl=document.getElementById("syncPull"); if(pl) pl.addEventListener("click",function(){ pull(false); });
+    if(a) a.addEventListener("change",function(){ try{ localStorage.setItem(AUTO_K, a.checked?"1":"0"); }catch(e){} if(a.checked){ note("Auto-sync on."); autoOpen(); } else { note("Auto-sync off."); } });
+    startAuto();
+    autoOpen();
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
 })();
 </script>
 </body>
