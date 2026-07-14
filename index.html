@@ -284,8 +284,8 @@
   #tab-supps .stk-datestamp{font-family:var(--ff-num);font-size:9.5px;color:var(--faint)}
   #tab-supps .stk-empty{color:var(--faint);font-size:13px;text-align:center;padding:26px 10px;line-height:1.6}
 
-  /* home: adherence heatmap */
-  .hheat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin-top:0}
+  /* home: adherence heatmap + backup strip */
+  .hheat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin-top:0;flex:none}
   .hheat-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px}
   .hheat-head>span:first-child{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
   .hheat-sub{font-family:var(--ff-num);font-size:9.5px;color:var(--faint);letter-spacing:.06em}
@@ -298,17 +298,12 @@
   .hheat-c.train{background:var(--protein);box-shadow:0 0 7px color-mix(in srgb,var(--protein) 55%,transparent)}
   .hheat-c.prot{background:var(--carbs);box-shadow:0 0 7px color-mix(in srgb,var(--carbs) 55%,transparent)}
   .hheat-c.supp{background:var(--blue);box-shadow:0 0 7px color-mix(in srgb,var(--blue) 55%,transparent)}
+  .hbackup{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 12px;margin-top:auto}
+  .hbackup-txt{flex:1;min-width:0;font-family:var(--ff-num);font-size:10.5px;color:var(--muted);line-height:1.45}
+  .hbackup-btn{flex:none;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);color:var(--text);font-family:var(--ff-ui);font-weight:700;font-size:12px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+  .hbackup-btn:active{background:var(--border)}
 
-  /* auto-export reminder */
-  .export-reminder{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom));z-index:35;width:min(420px,calc(100% - 24px));background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:12px 13px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
-  .export-reminder[hidden]{display:none}
-  .export-reminder .er-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-  .export-reminder .er-txt b{font-size:12.5px;font-weight:700}
-  .export-reminder .er-txt span{font-size:11px;color:var(--muted);line-height:1.4}
-  .export-reminder .er-btns{display:flex;gap:6px;flex:none}
-  .export-reminder button{border:none;border-radius:9px;font-family:var(--ff-ui);font-weight:600;font-size:12px;padding:8px 11px;cursor:pointer}
-  .export-reminder .er-later{background:transparent;color:var(--muted);border:1px solid var(--border)}
-  .export-reminder .er-go{background:var(--grad);color:#2a0710;box-shadow:var(--glow)}
+  .hbackup-btn:active{background:var(--border)}
 
   /* stack editor */
   #stackList .se-phase{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:14px 4px 7px}
@@ -544,7 +539,8 @@
   #tab-lift .exc-hist:active{color:var(--blue)}
 
   /* home dashboard */
-  #tab-home .home-brand{display:flex;align-items:center;gap:10px;margin:2px 2px 10px;padding-top:calc(4px + env(safe-area-inset-top))}
+  #tab-home.active{display:flex;flex-direction:column;min-height:calc(100dvh - 72px - env(safe-area-inset-bottom))}
+  #tab-home .home-brand{display:flex;align-items:center;gap:10px;margin:2px 2px 10px;padding-top:calc(4px + env(safe-area-inset-top));flex:none}
   #tab-home .brand-logo{height:32px;width:auto;display:block;mix-blend-mode:screen}
   #tab-home .brand-word{height:10px;width:auto;display:block;mix-blend-mode:screen;align-self:flex-end;margin-bottom:3px}
   #tab-home .brand-icons{display:flex;align-items:center;gap:13px;margin-left:auto}
@@ -553,27 +549,27 @@
   #tab-home .brand-div{width:1px;height:16px;background:var(--faint);opacity:.55;flex:none}
   /* hero ring */
   #tab-home{--brand:#1E90F5}
-  #tab-home .hero{position:relative;background:linear-gradient(165deg,#191C26 0%,#101219 100%);border:1px solid var(--border);border-radius:20px;padding:16px 14px 14px;margin-bottom:8px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  #tab-home .hero{position:relative;background:linear-gradient(165deg,#191C26 0%,#101219 100%);border:1px solid var(--border);border-radius:20px;padding:18px 16px;margin-bottom:8px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:1;display:flex;flex-direction:column;justify-content:center;min-height:200px}
   #tab-home .hero::before{content:"";position:absolute;top:-42%;left:50%;transform:translateX(-50%);width:360px;height:360px;background:radial-gradient(circle,rgba(30,144,245,.20),transparent 66%);pointer-events:none}
   #tab-home .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:34%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);pointer-events:none}
   #tab-home .hero:active{transform:scale(.995)}
-  #tab-home .hero-rings{display:flex;align-items:center;justify-content:center;gap:14px;position:relative}
-  #tab-home .hero-cal{display:flex;flex-direction:column;align-items:center;flex:none}
-  #tab-home .ring-wrap{position:relative;width:158px;height:158px;margin:0}
+  #tab-home .hero-rings{display:flex;align-items:center;justify-content:center;gap:18px;position:relative;flex:1}
+  #tab-home .hero-cal{display:flex;flex-direction:column;align-items:center;flex:none;justify-content:center}
+  #tab-home .ring-wrap{position:relative;width:172px;height:172px;margin:0}
   #tab-home .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
   #tab-home .ring-track{fill:none;stroke:var(--surface-2);stroke-width:11}
   #tab-home .ring-prog{fill:none;stroke:var(--brand);stroke-width:11;stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1);filter:drop-shadow(0 0 6px rgba(30,144,245,.55))}
   #tab-home .ring-prog.over{stroke:var(--protein);filter:drop-shadow(0 0 6px rgba(255,77,109,.55))}
   #tab-home .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  #tab-home .ring-num{font-family:var(--ff-num);font-weight:800;font-size:40px;line-height:.92;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-  #tab-home .ring-goal{font-family:var(--ff-num);font-size:11px;color:var(--muted);margin-top:5px}
-  #tab-home .home-pill{display:block;width:max-content;margin:10px auto 0;font-family:var(--ff-num);font-size:11px;font-weight:700;color:var(--brand);background:rgba(30,144,245,.12);border:1px solid rgba(30,144,245,.32);padding:4px 11px;border-radius:20px;position:relative}
+  #tab-home .ring-num{font-family:var(--ff-num);font-weight:800;font-size:43px;line-height:.92;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  #tab-home .ring-goal{font-family:var(--ff-num);font-size:11.5px;color:var(--muted);margin-top:5px}
+  #tab-home .home-pill{display:block;width:max-content;margin:12px auto 0;font-family:var(--ff-num);font-size:11px;font-weight:700;color:var(--brand);background:rgba(30,144,245,.12);border:1px solid rgba(30,144,245,.32);padding:4px 11px;border-radius:20px;position:relative}
   #tab-home .home-pill.over{color:var(--protein);background:rgba(255,77,109,.12);border-color:rgba(255,77,109,.36)}
   #tab-home .home-pill:empty{display:none}
   /* macro mini rings — stacked beside calories */
-  #tab-home .mrings{display:flex;flex-direction:column;gap:7px;margin-top:0;position:relative;flex:none;padding-top:2px}
-  #tab-home .mring{display:flex;flex-direction:row;align-items:center;gap:8px}
-  #tab-home .mring-wrap{position:relative;width:46px;height:46px;flex:none}
+  #tab-home .mrings{display:flex;flex-direction:column;gap:11px;margin-top:0;position:relative;flex:none;padding-top:2px;justify-content:center}
+  #tab-home .mring{display:flex;flex-direction:row;align-items:center;gap:9px}
+  #tab-home .mring-wrap{position:relative;width:52px;height:52px;flex:none}
   #tab-home .mring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
   #tab-home .mring-track{fill:none;stroke:var(--surface-2);stroke-width:5}
   #tab-home .mring-prog{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:125.66;stroke-dashoffset:125.66;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1)}
@@ -581,10 +577,10 @@
   #tab-home .mring-prog.c,
   #tab-home .mring-prog.f{stroke:var(--brand)}
   #tab-home .mring-prog.over{stroke:var(--protein)}
-  #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:11px;color:var(--text);font-variant-numeric:tabular-nums}
-  #tab-home .mring-l{font-size:10px;color:var(--muted);letter-spacing:.02em;font-weight:600;min-width:44px}
+  #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums}
+  #tab-home .mring-l{font-size:10.5px;color:var(--muted);letter-spacing:.02em;font-weight:600;min-width:46px}
   /* training card */
-  #tab-home .htrain{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s,border-color .15s;margin-bottom:8px}
+  #tab-home .htrain{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s,border-color .15s;margin-bottom:8px;flex:none}
   #tab-home .htrain:active{transform:scale(.99);border-color:var(--faint)}
   #tab-home .htrain-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
   #tab-home .htrain-head svg{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round}
@@ -755,6 +751,11 @@
     <div class="hheat">
       <div class="hheat-head"><span>Last 14 days</span><span class="hheat-sub">trained · protein · supps</span></div>
       <div class="hheat-grid" id="hHeat"></div>
+    </div>
+
+    <div class="hbackup">
+      <div class="hbackup-txt" id="hBackupTxt">Checking backup status…</div>
+      <button class="hbackup-btn" id="hBackupBtn" type="button">Back up</button>
     </div>
   </div>
 
@@ -1074,12 +1075,6 @@
 
 <!-- Backdrop -->
 <div class="backdrop" id="backdrop"></div>
-
-<!-- Auto-export reminder -->
-<div class="export-reminder" id="exportReminder" hidden>
-  <div class="er-txt"><b>Back up your data</b><span>Browsers can clear app storage. Save a backup so nothing is lost.</span></div>
-  <div class="er-btns"><button class="er-later" id="erLater">Later</button><button class="er-go" id="erExport">Export</button></div>
-</div>
 
 <!-- Add-food sheet -->
 <div class="sheet" id="addSheet" role="dialog" aria-modal="true">
@@ -2855,7 +2850,7 @@
     a.href=url; a.download="fitness-backup-"+keyOf(new Date())+".json"; document.body.appendChild(a); a.click();
     setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },120);
     try{ localStorage.setItem("mt_lastexport", String(Date.now())); }catch(e){}
-    var eb=document.getElementById("exportReminder"); if(eb) eb.hidden=true;
+    if(window.__renderBackupStatus) window.__renderBackupStatus();
     var n=document.getElementById("backupNote"), old=n.textContent; n.textContent="Exported \u2713"; setTimeout(function(){ n.textContent=old; },1500);
   }
   async function importData(file){
@@ -2871,6 +2866,8 @@
   document.getElementById("exportData").addEventListener("click", exportData);
   document.getElementById("importData").addEventListener("click", function(){ document.getElementById("importFile").click(); });
   document.getElementById("importFile").addEventListener("change", function(e){ var f=e.target.files&&e.target.files[0]; if(f) importData(f); e.target.value=""; });
+  var hBackupBtn=document.getElementById("hBackupBtn");
+  if(hBackupBtn) hBackupBtn.addEventListener("click", function(e){ e.stopPropagation(); exportData(); });
 
   /* ---------- workout history: last time, PB, repeat ---------- */
   function wDatesWith(){ return Object.keys(workouts).filter(function(k){ return workouts[k]&&workouts[k].exercises&&workouts[k].exercises.length; }).sort(); }
@@ -3255,7 +3252,23 @@
         : "<span class='ht-rest'>Rest day — nothing scheduled</span>";
     }
     renderHeatmap();
+    renderBackupStatus();
   }
+  function renderBackupStatus(){
+    var el=document.getElementById("hBackupTxt"); if(!el) return;
+    var parts=[];
+    try{
+      var last=parseInt(localStorage.getItem("mt_lastexport"),10);
+      if(isFinite(last)){
+        var d=new Date(last);
+        parts.push("Last export "+d.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" · "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}));
+      } else parts.push("Not exported yet");
+      var cloud=localStorage.getItem("mt_syncauto")==="1" && localStorage.getItem("mt_syncurl") && localStorage.getItem("mt_synctoken");
+      parts.push(cloud?"Cloud sync on":"Cloud sync off");
+    }catch(e){ parts.push("Backup status unavailable"); }
+    el.textContent=parts.join(" · ");
+  }
+  window.__renderBackupStatus=renderBackupStatus;
   // Adherence heatmap: trained / hit protein / took supps over the last 14 days.
   function renderHeatmap(){
     var box=document.getElementById("hHeat"); if(!box) return;
@@ -3802,33 +3815,6 @@
     autoOpen();
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
-})();
-</script>
-<script>
-/* ---------- auto-export reminder (localStorage can be evicted on iOS PWAs) ---------- */
-(function(){
-  var DAY=86400000, STALE=14*DAY, SNOOZE=7*DAY;
-  function ls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
-  function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
-  function cloudSafetyNet(){ return ls("mt_syncauto")==="1" && ls("mt_syncurl") && ls("mt_synctoken"); }
-  function hasRealData(){ return !!(ls("mt_log")||ls("mt_workouts")||ls("mt_body")||ls("mt_supps_stack")); }
-  function due(){
-    if(cloudSafetyNet()) return false;      // cloud sync already protects the data
-    if(!hasRealData()) return false;         // nothing worth backing up yet
-    var now=Date.now();
-    var snooze=parseInt(ls("mt_export_snooze"),10); if(isFinite(snooze) && now-snooze<SNOOZE) return false;
-    var last=parseInt(ls("mt_lastexport"),10);
-    if(!isFinite(last)) return true;         // never exported
-    return (now-last)>STALE;
-  }
-  function show(){
-    var el=document.getElementById("exportReminder"); if(!el||!due()) return;
-    el.hidden=false;
-    var later=document.getElementById("erLater"), go=document.getElementById("erExport");
-    if(later) later.onclick=function(){ lset("mt_export_snooze", String(Date.now())); el.hidden=true; };
-    if(go) go.onclick=function(){ var b=document.getElementById("exportData"); if(b) b.click(); el.hidden=true; };
-  }
-  setTimeout(show, 2500);
 })();
 </script>
 </body>
