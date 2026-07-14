@@ -329,7 +329,8 @@
   #stackList .se-dose{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--protein);flex:none}
   #stackList .se-chev{color:var(--faint);flex:none}
 
-  html:has(#tab-body.active),body:has(#tab-body.active){overflow:hidden;height:100%}
+  html:has(#tab-body.active),body:has(#tab-body.active),
+  html:has(#tab-home.active),body:has(#tab-home.active){overflow:hidden;height:100%}
 
   /* body / measurements */
   #tab-body.active{
@@ -556,8 +557,12 @@
   #tab-lift .exc-hist:active{color:var(--blue)}
 
   /* home dashboard */
-  #tab-home.active{display:flex;flex-direction:column;gap:8px;min-height:calc(100dvh - 72px - env(safe-area-inset-bottom))}
-  #tab-home .home-brand{display:flex;align-items:center;gap:10px;margin:2px 2px 0;padding-top:calc(4px + env(safe-area-inset-top));flex:none}
+  #tab-home.active{
+    display:flex;flex-direction:column;gap:6px;overflow:hidden;
+    height:calc(100dvh - 80px - env(safe-area-inset-bottom));
+    max-height:calc(100dvh - 80px - env(safe-area-inset-bottom));
+  }
+  #tab-home .home-brand{display:flex;align-items:center;gap:10px;margin:0 2px;padding-top:calc(4px + env(safe-area-inset-top));flex:none}
   #tab-home .brand-logo{height:32px;width:auto;display:block;mix-blend-mode:screen}
   #tab-home .brand-word{height:10px;width:auto;display:block;mix-blend-mode:screen;align-self:flex-end;margin-bottom:3px}
   #tab-home .brand-icons{display:flex;align-items:center;gap:13px;margin-left:auto}
@@ -567,13 +572,13 @@
   #tab-home .brand-div{width:1px;height:16px;background:var(--faint);opacity:.55;flex:none}
   /* hero ring */
   #tab-home{--brand:#1E90F5}
-  #tab-home .hero{position:relative;background:linear-gradient(165deg,#191C26 0%,#101219 100%);border:1px solid var(--border);border-radius:20px;padding:18px 16px;margin-bottom:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:1;display:flex;flex-direction:column;justify-content:center;min-height:200px}
+  #tab-home .hero{position:relative;background:linear-gradient(165deg,#191C26 0%,#101219 100%);border:1px solid var(--border);border-radius:20px;padding:14px 14px;margin-bottom:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
   #tab-home .hero::before{content:"";position:absolute;top:-42%;left:50%;transform:translateX(-50%);width:360px;height:360px;background:radial-gradient(circle,rgba(30,144,245,.20),transparent 66%);pointer-events:none}
   #tab-home .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:34%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);pointer-events:none}
   #tab-home .hero:active{transform:scale(.995)}
-  #tab-home .hero-rings{display:flex;align-items:center;justify-content:center;gap:18px;position:relative;flex:1}
+  #tab-home .hero-rings{display:flex;align-items:center;justify-content:center;gap:14px;position:relative;flex:1;min-height:0}
   #tab-home .hero-cal{display:flex;flex-direction:column;align-items:center;flex:none;justify-content:center}
-  #tab-home .ring-wrap{position:relative;width:172px;height:172px;margin:0}
+  #tab-home .ring-wrap{position:relative;width:min(168px,40vw);height:min(168px,40vw);margin:0;flex:none}
   #tab-home .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
   #tab-home .ring-track{fill:none;stroke:var(--surface-2);stroke-width:11}
   #tab-home .ring-prog{fill:none;stroke:var(--brand);stroke-width:11;stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1);filter:drop-shadow(0 0 6px rgba(30,144,245,.55))}
@@ -585,9 +590,9 @@
   #tab-home .home-pill.over{color:var(--protein);background:rgba(255,77,109,.12);border-color:rgba(255,77,109,.36)}
   #tab-home .home-pill:empty{display:none}
   /* macro mini rings — stacked beside calories */
-  #tab-home .mrings{display:flex;flex-direction:column;gap:11px;margin-top:0;position:relative;flex:none;padding-top:2px;justify-content:center}
+  #tab-home .mrings{display:flex;flex-direction:column;gap:8px;margin-top:0;position:relative;flex:none;padding-top:0;justify-content:center}
   #tab-home .mring{display:flex;flex-direction:row;align-items:center;gap:9px}
-  #tab-home .mring-wrap{position:relative;width:52px;height:52px;flex:none}
+  #tab-home .mring-wrap{position:relative;width:46px;height:46px;flex:none}
   #tab-home .mring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
   #tab-home .mring-track{fill:none;stroke:var(--surface-2);stroke-width:5}
   #tab-home .mring-prog{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:125.66;stroke-dashoffset:125.66;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1)}
@@ -598,9 +603,9 @@
   #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums}
   #tab-home .mring-l{font-size:10.5px;color:var(--muted);letter-spacing:.02em;font-weight:600;min-width:46px}
   /* training card */
-  #tab-home .htrain{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s,border-color .15s;margin-bottom:0;flex:none}
+  #tab-home .htrain{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s,border-color .15s;margin-bottom:0;flex:none}
   #tab-home .htrain:active{transform:scale(.99);border-color:var(--faint)}
-  #tab-home .htrain-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  #tab-home .htrain-head{display:flex;align-items:center;gap:9px;margin-bottom:6px}
   #tab-home .htrain-head svg{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round}
   #tab-home .htrain-head span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
   #tab-home .htrain-body{font-size:14px;color:var(--text)}
@@ -610,6 +615,8 @@
   #tab-home .ht-bar{width:4px;height:20px;border-radius:3px;flex:none}
   #tab-home .ht-name{font-weight:600}
   #tab-home .ht-time{font-family:var(--ff-num);color:var(--muted);font-size:12.5px;margin-left:auto}
+  #tab-home .hheat{padding:8px 10px}
+  #tab-home .hbackup{padding:9px 10px}
 
   /* editable quantity */
   #tab-food .qnum{width:42px;text-align:center;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--ff-num);font-size:13px;font-weight:600;padding:5px 2px;outline:none;-moz-appearance:textfield}
