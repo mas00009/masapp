@@ -323,13 +323,9 @@
   .tabbtn:active{background:var(--surface)}
 
   /* supps: The Stack */
-  #tab-supps .stk-timeline{position:relative;padding-left:22px}
-  #tab-supps .stk-timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--protein),var(--fat));opacity:.45}
+  #tab-supps .stk-timeline{position:relative}
   #tab-supps .stk-phase{position:relative;padding-bottom:10px}
   #tab-supps .stk-phase:last-child{padding-bottom:0}
-  #tab-supps .stk-node{position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);display:grid;place-items:center}
-  #tab-supps .stk-node::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 9px var(--accent)}
-  #tab-supps .stk-phase.active .stk-node{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
   #tab-supps .stk-phase-head{display:flex;align-items:center;gap:6px;margin-bottom:4px}
   #tab-supps .stk-time{font-family:var(--ff-num);font-size:10px;font-weight:600;color:var(--accent)}
   #tab-supps .stk-phase-name{font-size:10px;color:var(--faint);font-weight:500}
@@ -347,11 +343,9 @@
   #tab-supps .stk-item.done .stk-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
   #tab-supps .stk-check.on{background:var(--accent);border-color:var(--accent)}
   #tab-supps .stk-check.on svg{opacity:1}
-  #tab-supps .stk-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
   #tab-supps .stk-allbtn{margin:4px 0 0;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--ff-num);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:7px;cursor:pointer}
   #tab-supps .stk-allbtn:active{background:var(--surface-2)}
   #tab-supps .stk-allbtn.done{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
-  #tab-supps .stk-datestamp{font-family:var(--ff-num);font-size:9.5px;color:var(--faint)}
   #tab-supps .stk-empty{color:var(--faint);font-size:13px;text-align:center;padding:26px 10px;line-height:1.6}
   #tab-supps.active{
     display:flex;flex-direction:column;overflow:hidden;
@@ -361,7 +355,6 @@
   #tab-supps .apphead{flex:none}
   #tab-supps .summary{flex:none}
   #tab-supps .stk-timeline{flex:1;min-height:0;overflow:hidden}
-  #tab-supps .stk-footer{flex:none;margin-top:0}
 
   /* home: adherence heatmap + backup strip */
   .hheat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin-top:0;flex:none}
@@ -664,8 +657,8 @@
   #tab-home .hero::before{content:"";position:absolute;top:-42%;left:50%;transform:translateX(-50%);width:360px;height:360px;background:radial-gradient(circle,rgba(30,144,245,.20),transparent 66%);pointer-events:none}
   #tab-home .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:34%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);pointer-events:none}
   #tab-home .hero:active{transform:scale(.995)}
-  #tab-home .hero-rings{display:flex;align-items:center;justify-content:center;gap:20px;position:relative;flex:1;min-height:0}
-  #tab-home .hero-cal{display:flex;flex-direction:column;align-items:center;flex:none;justify-content:center}
+  #tab-home .hero-rings{display:flex;align-items:stretch;justify-content:center;gap:20px;position:relative;flex:1;min-height:0}
+  #tab-home .hero-cal{display:flex;flex-direction:column;align-items:center;flex:none;justify-content:space-between}
   #tab-home .ring-wrap{position:relative;width:min(210px,46vw);height:min(210px,46vw);margin:0;flex:none}
   #tab-home .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
   #tab-home .ring-track{fill:none;stroke:var(--surface-2);stroke-width:11}
@@ -674,23 +667,23 @@
   #tab-home .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
   #tab-home .ring-num{font-family:var(--ff-num);font-weight:800;font-size:52px;line-height:.92;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
   #tab-home .ring-goal{font-family:var(--ff-num);font-size:13px;color:var(--muted);margin-top:5px}
-  #tab-home .home-pill{display:block;width:max-content;margin:12px auto 0;font-family:var(--ff-num);font-size:11.5px;font-weight:700;color:var(--brand);background:rgba(30,144,245,.12);border:1px solid rgba(30,144,245,.32);padding:4px 11px;border-radius:20px;position:relative}
+  #tab-home .home-pill{display:block;width:max-content;margin:0 auto;font-family:var(--ff-num);font-size:11.5px;font-weight:700;color:var(--brand);background:rgba(30,144,245,.12);border:1px solid rgba(30,144,245,.32);padding:4px 11px;border-radius:20px;position:relative;flex:none}
   #tab-home .home-pill.over{color:var(--protein);background:rgba(255,77,109,.12);border-color:rgba(255,77,109,.36)}
   #tab-home .home-pill:empty{display:none}
   /* macro mini rings - stacked beside calories */
-  #tab-home .mrings{display:flex;flex-direction:column;gap:10px;margin-top:0;position:relative;flex:none;padding-top:0;justify-content:center}
-  #tab-home .mring{display:flex;flex-direction:row;align-items:center;gap:11px}
-  #tab-home .mring-wrap{position:relative;width:58px;height:58px;flex:none}
+  #tab-home .mrings{display:flex;flex-direction:column;justify-content:space-between;align-self:stretch;flex:1;min-width:0;max-width:168px;margin-top:0;position:relative;padding:0}
+  #tab-home .mring{display:flex;flex-direction:row;align-items:center;gap:14px;flex:none}
+  #tab-home .mring-wrap{position:relative;width:76px;height:76px;flex:none}
   #tab-home .mring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
-  #tab-home .mring-track{fill:none;stroke:var(--surface-2);stroke-width:5}
-  #tab-home .mring-prog{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:125.66;stroke-dashoffset:125.66;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1)}
+  #tab-home .mring-track{fill:none;stroke:var(--surface-2);stroke-width:6}
+  #tab-home .mring-prog{fill:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:125.66;stroke-dashoffset:125.66;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1)}
   #tab-home .mring-prog.p{stroke:var(--protein-dial)}
   #tab-home .mring-prog.c{stroke:var(--carbs)}
   #tab-home .mring-prog.f{stroke:var(--fat-dial)}
-  #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:14px;color:var(--text);font-variant-numeric:tabular-nums}
-  #tab-home .mring-txt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
-  #tab-home .mring-l{font-size:12px;color:var(--muted);letter-spacing:.02em;font-weight:600}
-  #tab-home .mring-left{display:inline-block;width:max-content;font-family:var(--ff-num);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid transparent;line-height:1.3}
+  #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:17px;color:var(--text);font-variant-numeric:tabular-nums}
+  #tab-home .mring-txt{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;min-width:0;flex:1}
+  #tab-home .mring-l{font-size:14px;color:var(--muted);letter-spacing:.02em;font-weight:600;line-height:1.1}
+  #tab-home .mring-left{display:inline-block;width:max-content;font-family:var(--ff-num);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid transparent;line-height:1.3}
   #tab-home .mring-left:empty{display:none}
   #tab-home .mring-left.p{color:var(--protein-dial);background:color-mix(in srgb,var(--protein-dial) 13%,transparent);border-color:color-mix(in srgb,var(--protein-dial) 34%,transparent)}
   #tab-home .mring-left.c{color:var(--carbs);background:color-mix(in srgb,var(--carbs) 13%,transparent);border-color:color-mix(in srgb,var(--carbs) 34%,transparent)}
@@ -985,10 +978,6 @@
     </section>
 
     <div class="stk-timeline" id="timeline"></div>
-
-    <footer class="stk-footer">
-      <span class="stk-datestamp" id="datestamp"></span>
-    </footer>
   </div><!-- /tab-supps -->
 
   <div id="tab-body" class="tab-panel">
@@ -1372,6 +1361,7 @@
   </div>
   <div class="sheet-body">
     <input type="hidden" id="schDay" value="0">
+    <input type="hidden" id="schWeekStart" value="">
     <div class="field"><label>Type</label><select id="schType">
       <option value="gym">Gym</option><option value="basketball">Basketball</option>
       <option value="swimming">Swimming</option>
@@ -1527,7 +1517,7 @@
   var FOODS_KEY="mt_foods", TARGETS_KEY="mt_targets", LOG_KEY="mt_log";
   var FOODVER_KEY="mt_foodsver", FOOD_VERSION=5;
   var LOGRESET_KEY="mt_logreset", LOGRESET_VERSION=1;
-  var SCHEMA_KEY="mt_schema_version", SCHEMA_VERSION=1;
+  var SCHEMA_KEY="mt_schema_version", SCHEMA_VERSION=2;
   var AIKEY_KEY="mt_aikey", AIMODEL_KEY="mt_aimodel", AIMODEL_CUSTOM_KEY="mt_ai_custom_models";
   var AI_PRESETS=[
     {id:"google/gemini-2.5-flash", name:"Gemini 2.5 Flash — fast & cheap"},
@@ -2557,8 +2547,9 @@
   }
   function collectSchedule(){
     return schedule.map(function(s){
-      return {day:DAYS_FULL[s.day], type:s.type, title:s.title||"", time:s.time?fmtSchedTime(s.time):""};
-    });
+      var dk=schedDateKey(s);
+      return {date:dk||null, day:DAYS_FULL[s.day], type:s.type, title:s.title||"", time:s.time?fmtSchedTime(s.time):""};
+    }).filter(function(s){ return s.date; });
   }
   function collectWaterWindow(days){
     function offKey(i){ var dt=new Date(); dt.setDate(dt.getDate()-i); return keyOf(dt); }
@@ -2712,6 +2703,27 @@
       : (mon.getDate()+" "+MON_SHORT[mon.getMonth()]+" \u2013 "+sun.getDate()+" "+MON_SHORT[sun.getMonth()]);
     return label;
   }
+  function planWeekKey(offset){ return keyOf(planWeekStart(offset!=null?offset:planWeekOffset)); }
+  function schedDateKey(s){
+    if(!s) return null;
+    if(s.date) return s.date;
+    if(s.weekStart!=null && s.day!=null){
+      var mon=dateFromKey(s.weekStart), d=new Date(mon.getTime());
+      d.setDate(mon.getDate()+Number(s.day));
+      return keyOf(d);
+    }
+    return null;
+  }
+  function schedInPlanWeek(s, weekStartKey){
+    if(!s||s.day==null||s.day<0||s.day>6) return false;
+    if(s.weekStart) return s.weekStart===weekStartKey;
+    return weekStartKey===planWeekKey(0);
+  }
+  function sessionsForDateKey(k){
+    return schedule.filter(function(s){ return schedDateKey(s)===k; }).sort(function(a,b){
+      var ta=a.time||"99:99", tb=b.time||"99:99"; return ta<tb?-1:ta>tb?1:0;
+    });
+  }
   var STYPES=[
     {k:"gym",label:"Gym",color:"var(--ok)"},
     {k:"basketball",label:"Basketball",color:"var(--blue)"},
@@ -2828,9 +2840,7 @@
     return w.exercises.some(function(e){ return (e.sets||[]).some(function(st){ return st.done; }); });
   }
   function schedTypeCountForKey(k, type){
-    var p=k.split("-"), d=new Date(+p[0],+p[1]-1,+p[2]);
-    var dayIdx=(d.getDay()+6)%7;
-    return schedule.filter(function(s){ return s.day===dayIdx && s.type===type; }).length;
+    return schedule.filter(function(s){ return schedDateKey(s)===k && s.type===type; }).length;
   }
   function monthKeysSoFar(){
     var t=new Date(), t0=new Date(t.getFullYear(),t.getMonth(),1), out=[];
@@ -2897,9 +2907,10 @@
     var strip=document.getElementById("weekStrip"), days=document.getElementById("planDays");
     if(!strip||!days) return;
     var byDay=[[],[],[],[],[],[],[]];
-    schedule.forEach(function(s){ if(s.day>=0&&s.day<7) byDay[s.day].push(s); });
+    var ws=planWeekKey();
+    schedule.forEach(function(s){ if(schedInPlanWeek(s, ws)) byDay[s.day].push(s); });
     byDay.forEach(function(a){ a.sort(function(x,y){ var tx=x.time||"99:99", ty=y.time||"99:99"; return tx<ty?-1:tx>ty?1:0; }); });
-    var total=schedule.length, ti=todayIdx(), showToday=planWeekOffset===0;
+    var ti=todayIdx(), showToday=planWeekOffset===0;
     var lbl=document.getElementById("planWeekLabel");
     if(lbl) lbl.textContent=planWeekLabel();
     strip.innerHTML=DAYS_SHORT.map(function(d,i){
@@ -2936,6 +2947,7 @@
     var s = id ? schedule.filter(function(x){return x.id===id;})[0] : null;
     var dayIdx = s ? s.day : (dayPre!=null ? dayPre : todayIdx());
     document.getElementById("schDay").value = String(dayIdx);
+    document.getElementById("schWeekStart").value = s ? (s.weekStart||planWeekKey()) : planWeekKey();
     var d=planWeekDate(dayIdx);
     document.getElementById("schHeading").textContent = (s ? "Edit session" : "Add session")+" · "+DAYS_FULL[dayIdx]+" "+d.getDate()+" "+MON_SHORT[d.getMonth()];
     document.getElementById("schType").value = s ? s.type : "gym";
@@ -2949,14 +2961,15 @@
   }
   function saveSched(){
     var day=parseInt(document.getElementById("schDay").value,10)||0;
+    var weekStart=document.getElementById("schWeekStart").value||planWeekKey();
     var type=document.getElementById("schType").value||"gym";
     var title=document.getElementById("schTitleInput").value.trim();
     var time=document.getElementById("schTime").value||defaultTimeForType(type);
     if(editSchedId){
       var s=schedule.filter(function(x){return x.id===editSchedId;})[0];
-      if(s){ s.day=day; s.type=type; s.title=title; s.time=time; }
+      if(s){ s.day=day; s.weekStart=weekStart; s.type=type; s.title=title; s.time=time; }
     } else {
-      schedule.push({id:uid(),day:day,type:type,title:title,time:time});
+      schedule.push({id:uid(),day:day,weekStart:weekStart,type:type,title:title,time:time});
     }
     saveSchedule(); renderPlan(); closeSheets();
   }
@@ -3630,7 +3643,8 @@
   var JOURNAL_KEY="mt_journal", journal={};
   function saveJournal(){ sSet(JOURNAL_KEY, JSON.stringify(journal)); }
 
-  function sessionsForDay(i){ return schedule.filter(function(s){return s.day===i;}).sort(function(a,b){ var ta=a.time||"99:99", tb=b.time||"99:99"; return ta<tb?-1:ta>tb?1:0; }); }
+  function sessionsForDay(dayIdx){ return sessionsForDateKey(keyOf(planWeekDate(dayIdx))); }
+  function sessionsToday(){ return sessionsForDateKey(keyOf(new Date())); }
 
   /* ---------- apply coach targets ---------- */
   var coachSuggested=null;
@@ -3658,7 +3672,7 @@
     return phases[ai].querySelectorAll(".stk-check.on").length < checks.length;
   }
   function planAlertNow(){
-    var arr=sessionsForDay(todayIdx()); if(!arr.length) return false;
+    var arr=sessionsToday(); if(!arr.length) return false;
     var now=new Date(), cur=now.getHours()*60+now.getMinutes();
     for(var i=0;i<arr.length;i++){
       var t=arr[i].time; if(!t) continue;
@@ -3727,8 +3741,8 @@
     // training
     var el=document.getElementById("hTrain");
     if(el){
-      var arr=sessionsForDay(todayIdx());
-      el.innerHTML = arr.length ? arr.map(function(s){ var st=styleFor(s.type); return "<div class='ht-sess'><span class='ht-bar' style='background:var(--brand)'></span><span class='ht-name'>"+esc(s.title||st.label)+"</span>"+(s.time?"<span class='ht-time'>"+esc(fmtSchedTime(s.time))+"</span>":"")+"</div>"; }).join("")
+      var arr=sessionsToday();
+      el.innerHTML = arr.length ? arr.map(function(s){ var st=styleFor(s.type); return "<div class='ht-sess'><span class='ht-bar' style='background:"+st.color+"'></span><span class='ht-name'>"+esc(s.title||st.label)+"</span>"+(s.time?"<span class='ht-time'>"+esc(fmtSchedTime(s.time))+"</span>":"")+"</div>"; }).join("")
         : "<span class='ht-rest'>Rest day - nothing scheduled</span>";
     }
     renderHeatmap();
@@ -3766,7 +3780,7 @@
     function wdIdx(k){ return (new Date(k+"T00:00:00").getDay()+6)%7; }
     function gymState(k){
       if(volumeForKey(k)>0) return "hit";
-      var scheduled=sessionsForDay(wdIdx(k)).length>0;
+      var scheduled=sessionsForDateKey(k).length>0;
       if(scheduled && dayActive(k)) return "miss";        // training day you were tracking but skipped
       return "";                                          // rest day or empty = grey
     }
@@ -3804,7 +3818,13 @@
       if(!Array.isArray(schedule)) schedule=[];
       if(!log||typeof log!=="object") log={};
     }
-    // (future) if(from<2){ ... }
+    if(from<2){
+      var ws=keyOf(planWeekStart(0));
+      schedule.forEach(function(s){
+        if(!s.weekStart && s.day!=null && s.day>=0 && s.day<7) s.weekStart=ws;
+      });
+    }
+    // (future) if(from<3){ ... }
     saveWorkouts(); savePlans(); saveSchedule(); await saveLog();
     await sSet(SCHEMA_KEY, String(SCHEMA_VERSION));
   }
@@ -3982,12 +4002,6 @@
     var next=document.getElementById('suppNextDay');
     if(next) next.disabled=(viewKey()>=realToday);
   }
-  function updateDatestamp(){
-    var ds=document.getElementById('datestamp'); if(!ds) return;
-    var d=dateFromKey(viewKey());
-    ds.textContent=d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
-  }
-
   function freqLabel(n){ n=parseInt(n,10)||1; if(n<=1) return ""; if(n===2) return "every 2nd day"; if(n===3) return "every 3rd day"; if(n===7) return "once a week"; return "every "+n+" days"; }
   function isDue(item, key){
     var n=parseInt(item.freq,10)||1; if(n<=1) return true;
@@ -4016,13 +4030,12 @@
           "<span class='stk-dose'>"+esc(it.dose||"")+"</span></div>";
       }).join("");
       html+="<section class='stk-phase' data-start='"+ph.start+"' data-phase='"+ph.id+"' style='--accent:"+(ph.accent||"var(--protein)")+"'>"+
-        "<span class='stk-node'></span>"+
         "<div class='stk-phase-head'><span class='stk-time'>"+esc(ph.time||"")+"</span><span class='stk-phase-name'>"+esc(ph.name||"")+"</span></div>"+
         "<div class='stk-items'>"+items+"</div>"+
         "<button class='stk-allbtn' data-phase-all='"+ph.id+"'>Mark all taken</button></section>";
     });
     timeline.innerHTML = any ? html : "<div class='stk-empty'>"+(isViewToday()?"Nothing scheduled today.":"Nothing due this day.")+"<br>Tap the ✎ icon to build your stack.</div>";
-    refresh(); syncAllBtns(); tick(); updateDatestamp();
+    refresh(); syncAllBtns(); tick();
   }
 
   function dueItems(){ var out=[]; stack.phases.forEach(function(ph){ (ph.items||[]).forEach(function(it){ if(isDue(it,viewKey())) out.push(it); }); }); return out; }
