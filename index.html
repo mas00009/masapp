@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22MasApp%22%2C%22short_name%22%3A%22MasApp%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%2C%22start_url%22%3A%22.%2F%22%7D">
 <title>MasApp</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -53,6 +54,19 @@
     -webkit-font-smoothing:antialiased;
     overscroll-behavior-y:none;
   }
+  html.portrait-locked,html.portrait-locked body{overflow:hidden;height:100%;width:100%}
+  html.portrait-locked body{position:fixed;inset:0}
+  #portraitLock{
+    display:none;position:fixed;inset:0;z-index:100000;
+    background:#000;color:var(--text);
+    flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    padding:max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    text-align:center;touch-action:none;-webkit-user-select:none;user-select:none;
+  }
+  #portraitLock.show{display:flex}
+  #portraitLock svg{width:52px;height:52px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  #portraitLock strong{font-family:var(--ff-ui);font-size:16px;font-weight:700;letter-spacing:.01em}
+  #portraitLock p{font-size:13px;color:var(--muted);line-height:1.5;max-width:240px}
   .app{
     max-width:440px;
     margin:0 auto;
@@ -339,6 +353,15 @@
   #tab-supps .stk-allbtn.done{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
   #tab-supps .stk-datestamp{font-family:var(--ff-num);font-size:9.5px;color:var(--faint)}
   #tab-supps .stk-empty{color:var(--faint);font-size:13px;text-align:center;padding:26px 10px;line-height:1.6}
+  #tab-supps.active{
+    display:flex;flex-direction:column;overflow:hidden;
+    height:calc(100dvh - 80px - env(safe-area-inset-bottom));
+    max-height:calc(100dvh - 80px - env(safe-area-inset-bottom));
+  }
+  #tab-supps .apphead{flex:none}
+  #tab-supps .summary{flex:none}
+  #tab-supps .stk-timeline{flex:1;min-height:0;overflow:hidden}
+  #tab-supps .stk-footer{flex:none;margin-top:0}
 
   /* home: adherence heatmap + backup strip */
   .hheat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin-top:0;flex:none}
@@ -367,7 +390,8 @@
   #stackList .se-dose{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--protein);flex:none}
   #stackList .se-chev{color:var(--faint);flex:none}
 
-  html:has(#tab-home.active),body:has(#tab-home.active){overflow:hidden;height:100%}
+  html:has(#tab-home.active,#tab-body.active,#tab-supps.active),
+  body:has(#tab-home.active,#tab-body.active,#tab-supps.active){overflow:hidden;height:100%}
 
   /* body / measurements */
   #tab-body.active{
@@ -760,6 +784,10 @@
 </style>
 </head>
 <body>
+<div id="portraitLock" aria-live="polite">
+  <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="14" y="6" width="20" height="36" rx="4"/><path d="M24 14v8M20 18h8"/><path d="M34 24h6M37 21v6"/></svg>
+  <div><strong>Rotate to portrait</strong><p>MasApp is portrait-only. Turn your phone upright to continue.</p></div>
+</div>
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
   <defs>
     <linearGradient id="mas-ic-grad" x1="0" y1="0" x2="1" y2="1">
@@ -1250,10 +1278,11 @@
     <div class="set-section">
       <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>AI features</span><span class="set-chev">›</span></button>
       <div class="set-body" hidden>
-        <div class="field" style="margin:0 2px 10px"><label>Anthropic API key</label><input type="password" id="aiKey" placeholder="sk-ant-..." autocomplete="off"></div>
-        <div class="field" style="margin:0 2px 10px"><label>Model</label><input type="text" id="aiModel" placeholder="claude-sonnet-4-6" autocomplete="off"></div>
+        <div class="field" style="margin:0 2px 10px"><label>OpenRouter API key</label><input type="password" id="aiKey" placeholder="sk-or-..." autocomplete="off"></div>
+        <div class="field" style="margin:0 2px 10px"><label>Model</label><select id="aiModelPick"></select></div>
+        <div class="field" id="aiModelCustomWrap" hidden style="margin:0 2px 10px"><label>Custom model ID</label><input type="text" id="aiModelCustom" placeholder="provider/model-name" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="mono-note" style="text-align:left;margin:6px 0 0">Any OpenRouter model slug, e.g. <code style="font-family:var(--ff-num);font-size:11px;color:var(--faint)">meta-llama/llama-4-maverick</code>. Saved models appear in the list.</div></div>
         <button class="ghost" id="saveAI">Save AI settings</button>
-        <div class="mono-note" style="text-align:left;margin:8px 2px 0">Stored only in this browser. Needed for Read image and AI estimate. Scan and Find by name work without it.</div>
+        <div class="mono-note" style="text-align:left;margin:8px 2px 0">Get a key at openrouter.ai. Stored only in this browser. Needed for Coach, Read image, and AI estimate.</div>
       </div>
     </div>
 
@@ -1499,9 +1528,16 @@
   var FOODVER_KEY="mt_foodsver", FOOD_VERSION=5;
   var LOGRESET_KEY="mt_logreset", LOGRESET_VERSION=1;
   var SCHEMA_KEY="mt_schema_version", SCHEMA_VERSION=1;
-  var AIKEY_KEY="mt_aikey", AIMODEL_KEY="mt_aimodel";
+  var AIKEY_KEY="mt_aikey", AIMODEL_KEY="mt_aimodel", AIMODEL_CUSTOM_KEY="mt_ai_custom_models";
+  var AI_PRESETS=[
+    {id:"google/gemini-2.5-flash", name:"Gemini 2.5 Flash — fast & cheap"},
+    {id:"openai/gpt-4o-mini", name:"GPT-4o mini — vision & JSON"},
+    {id:"anthropic/claude-3-5-haiku", name:"Claude 3.5 Haiku — quick replies"},
+    {id:"google/gemini-2.5-pro", name:"Gemini 2.5 Pro — smarter coach"},
+    {id:"anthropic/claude-sonnet-4", name:"Claude Sonnet 4 — best quality"}
+  ];
   var foods=[], targets={cal:1800,p:200,c:140,f:60}, log={};
-  var aiKey="", aiModel="claude-sonnet-4-6", findCache=[];
+  var aiKey="", aiModel="google/gemini-2.5-flash", aiCustomModels=[], findCache=[];
   var current=new Date();
   var addMeal="breakfast", editingId=null;
 
@@ -1683,9 +1719,42 @@
   }
 
   /* ---------- settings sheet ---------- */
+  function saveAiCustomModels(){ sSet(AIMODEL_CUSTOM_KEY, JSON.stringify(aiCustomModels)); }
+  function aiPresetIds(){ return AI_PRESETS.map(function(p){ return p.id; }); }
+  function renderAiModelPick(){
+    var sel=document.getElementById("aiModelPick"), wrap=document.getElementById("aiModelCustomWrap"), customInp=document.getElementById("aiModelCustom");
+    if(!sel) return;
+    var current=aiModel||"google/gemini-2.5-flash", presets=aiPresetIds();
+    if(presets.indexOf(current)<0 && aiCustomModels.indexOf(current)<0) aiCustomModels.push(current);
+    var html=AI_PRESETS.map(function(p){
+      return "<option value=\""+esc(p.id)+"\">"+esc(p.name)+"</option>";
+    }).join("");
+    aiCustomModels.forEach(function(m){
+      if(presets.indexOf(m)<0) html+="<option value=\""+esc(m)+"\">"+esc(m)+" (custom)</option>";
+    });
+    html+="<option value=\"__custom__\">+ Add custom model…</option>";
+    sel.innerHTML=html;
+    if(presets.indexOf(current)>=0 || aiCustomModels.indexOf(current)>=0){
+      sel.value=current;
+      if(wrap) wrap.hidden=true;
+    }else{
+      sel.value="__custom__";
+      if(wrap) wrap.hidden=false;
+      if(customInp) customInp.value=current;
+    }
+  }
+  function readAiModelFromUI(){
+    var sel=document.getElementById("aiModelPick");
+    if(!sel) return aiModel;
+    if(sel.value==="__custom__"){
+      var inp=document.getElementById("aiModelCustom");
+      return (inp&&inp.value?inp.value.trim():"")||"google/gemini-2.5-flash";
+    }
+    return sel.value;
+  }
   function renderManage(){
     document.getElementById("aiKey").value=aiKey||"";
-    document.getElementById("aiModel").value=aiModel||"claude-sonnet-4-6";
+    renderAiModelPick();
     renderTargets();
     renderProfile();
     var list=document.getElementById("manageList");
@@ -2081,19 +2150,56 @@
     }catch(e){ setStatus("Search failed. Check your connection.","err"); }
   }
 
-  /* Anthropic (needs your key) */
+  /* OpenRouter (needs your key) */
+  function resolveAiModel(model){
+    var m=(model||"google/gemini-2.5-flash").trim();
+    if(!m) m="google/gemini-2.5-flash";
+    if(m.indexOf("/")<0) m="anthropic/"+m;
+    return m;
+  }
+  function toOpenRouterContent(content){
+    if(!Array.isArray(content)) return content;
+    return content.map(function(part){
+      if(part.type==="image" && part.source && part.source.type==="base64"){
+        return {type:"image_url", image_url:{url:"data:"+(part.source.media_type||"image/jpeg")+";base64,"+part.source.data}};
+      }
+      if(part.type==="text") return {type:"text", text:part.text};
+      return part;
+    });
+  }
+  function toOpenRouterMessages(messages,system){
+    var out=[];
+    if(system) out.push({role:"system", content:system});
+    (messages||[]).forEach(function(m){
+      out.push({role:m.role, content:toOpenRouterContent(m.content)});
+    });
+    return out;
+  }
   async function aiComplete(messages,maxTokens,system){
-    if(!aiKey){ setStatus("Add your API key in settings (\u2699) to use AI.","err"); return null; }
-    var payload={model:aiModel||"claude-sonnet-4-6",max_tokens:maxTokens||500,messages:messages};
-    if(system) payload.system=system;
-    var res=await fetch("https://api.anthropic.com/v1/messages",{
+    if(!aiKey){ setStatus("Add your OpenRouter API key in settings (\u2699) to use AI.","err"); return null; }
+    var payload={
+      model:resolveAiModel(aiModel),
+      max_tokens:maxTokens||500,
+      messages:toOpenRouterMessages(messages,system)
+    };
+    var res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
       method:"POST",
-      headers:{"content-type":"application/json","x-api-key":aiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      headers:{
+        "content-type":"application/json",
+        "authorization":"Bearer "+aiKey,
+        "http-referer":location.href,
+        "x-title":"MasApp"
+      },
       body:JSON.stringify(payload)
     });
-    if(!res.ok) throw new Error("API "+res.status);
+    if(!res.ok){
+      var errBody="";
+      try{ errBody=await res.text(); }catch(e){}
+      throw new Error("API "+res.status+(errBody?(": "+errBody.slice(0,180)):""));
+    }
     var data=await res.json();
-    return (data.content||[]).filter(function(b){return b.type==="text";}).map(function(b){return b.text;}).join("");
+    var msg=data.choices && data.choices[0] && data.choices[0].message;
+    return msg && msg.content!=null ? String(msg.content) : "";
   }
   function parseMacroJSON(txt){
     var m=String(txt).replace(/```json/g,"").replace(/```/g,"").trim();
@@ -2197,9 +2303,23 @@
   });
   document.getElementById("saveAI").addEventListener("click",function(){
     aiKey=document.getElementById("aiKey").value.trim();
-    aiModel=document.getElementById("aiModel").value.trim()||"claude-sonnet-4-6";
+    aiModel=readAiModelFromUI();
+    var pick=document.getElementById("aiModelPick");
+    if(pick && pick.value==="__custom__"){
+      var m=aiModel, presets=aiPresetIds();
+      if(m && presets.indexOf(m)<0 && aiCustomModels.indexOf(m)<0){ aiCustomModels.push(m); saveAiCustomModels(); }
+      renderAiModelPick();
+      var sel=document.getElementById("aiModelPick"); if(sel) sel.value=m;
+      var wrap=document.getElementById("aiModelCustomWrap"); if(wrap) wrap.hidden=true;
+    }
     sSet(AIKEY_KEY,aiKey); sSet(AIMODEL_KEY,aiModel);
     var b=document.getElementById("saveAI"); b.textContent="Saved ✓"; setTimeout(function(){b.textContent="Save AI settings";},1200);
+  });
+  document.getElementById("aiModelPick").addEventListener("change",function(){
+    var wrap=document.getElementById("aiModelCustomWrap");
+    if(!wrap) return;
+    wrap.hidden=this.value!=="__custom__";
+    if(this.value==="__custom__"){ var inp=document.getElementById("aiModelCustom"); if(inp){ inp.value=""; inp.focus(); } }
   });
 
   /* ---------- body / measurements ---------- */
@@ -3233,7 +3353,7 @@
 
   /* ---------- backup / restore ---------- */
   async function exportData(){
-    var keys=["mt_foods","mt_targets","mt_log","mt_body","mt_profile","mt_schedule","mt_workouts","mt_plans","mt_rest","mt_water","mt_aimodel","mt_supps_stack","mt_journal","mt_schema_version"];
+    var keys=["mt_foods","mt_targets","mt_log","mt_body","mt_profile","mt_schedule","mt_workouts","mt_plans","mt_rest","mt_water","mt_aimodel","mt_ai_custom_models","mt_supps_stack","mt_journal","mt_schema_version"];
     var out={ _app:"macro-tracker", _exported:new Date().toISOString(), data:{}, stack:{} };
     for(var i=0;i<keys.length;i++){ var v=await sGet(keys[i]); if(v!=null) out.data[keys[i]]=v; }
     try{ for(var j=0;j<localStorage.length;j++){ var k=localStorage.key(j); if(k&&k.indexOf("stack-")===0) out.stack[k]=localStorage.getItem(k); } }catch(e){}
@@ -3691,32 +3811,27 @@
 
   /* ---------- boot ---------- */
   function initPortraitLock(){
-    if(!document.querySelector('link[rel="manifest"]')){
-      var manifest={
-        name:"MasApp",
-        short_name:"MasApp",
-        display:"standalone",
-        orientation:"portrait",
-        background_color:"#000000",
-        theme_color:"#000000",
-        start_url:location.href.split("#")[0]
-      };
-      var link=document.createElement("link");
-      link.rel="manifest";
-      link.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"}));
-      document.head.appendChild(link);
+    var overlay=document.getElementById("portraitLock");
+    function isPhoneLandscape(){
+      var w=window.innerWidth, h=window.innerHeight;
+      return w>h && h<520 && window.matchMedia("(pointer: coarse)").matches;
+    }
+    function updateOverlay(){
+      var on=isPhoneLandscape();
+      if(overlay) overlay.classList.toggle("show", on);
+      document.documentElement.classList.toggle("portrait-locked", on);
     }
     function lock(){
       try{
         if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(function(){});
         else if(screen.lockOrientation) screen.lockOrientation("portrait");
-        else if(screen.mozLockOrientation) screen.mozLockOrientation("portrait");
-        else if(screen.msLockOrientation) screen.msLockOrientation("portrait");
       }catch(e){}
+      updateOverlay();
     }
     lock();
-    document.addEventListener("click",lock,{once:true,passive:true});
-    window.addEventListener("orientationchange",lock);
+    window.addEventListener("resize", updateOverlay, {passive:true});
+    window.addEventListener("orientationchange", function(){ setTimeout(lock, 120); }, {passive:true});
+    document.addEventListener("visibilitychange", updateOverlay, {passive:true});
   }
   async function boot(){
     // One-time fresh start: wipe all saved app data once, then persist normally.
@@ -3743,6 +3858,8 @@
     if(String(lrRaw)!==String(LOGRESET_VERSION)){ log={}; await saveLog(); await sSet(LOGRESET_KEY, String(LOGRESET_VERSION)); }
     var kRaw=await sGet(AIKEY_KEY); if(kRaw) aiKey=kRaw;
     var mRaw=await sGet(AIMODEL_KEY); if(mRaw) aiModel=mRaw;
+    var cmRaw=await sGet(AIMODEL_CUSTOM_KEY);
+    if(cmRaw){ try{ var parsed=JSON.parse(cmRaw); if(Array.isArray(parsed)) aiCustomModels=parsed.filter(function(x){ return typeof x==="string"&&x.trim(); }); }catch(e){} }
     var bRaw=await sGet(BODY_KEY); if(bRaw){ try{ body=JSON.parse(bRaw); }catch(e){ body={}; } }
     var pRaw=await sGet(PROFILE_KEY); if(pRaw){ try{ profile=JSON.parse(pRaw); }catch(e){} }
     var scRaw=await sGet(SCHED_KEY); if(scRaw){ try{ schedule=JSON.parse(scRaw); }catch(e){ schedule=[]; } }
