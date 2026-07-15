@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0B0D12">
+<meta name="theme-color" content="#000000">
 <title>MasApp</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0B0D12;
+    --bg:#000000;
     --surface:#13151D;
     --surface-2:#1B1E28;
     --border:#252A38;
@@ -43,11 +43,8 @@
     --ff-num:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  html,body{height:100%;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--bg)}
   body{
-    background:
-      radial-gradient(130% 55% at 50% -8%, rgba(255,77,109,.07), transparent 60%),
-      var(--bg);
     color:var(--text);
     font-family:var(--ff-ui);
     font-size:14px;
@@ -312,33 +309,32 @@
   .tabbtn:active{background:var(--surface)}
 
   /* supps: The Stack */
-  #tab-supps .summary{margin-bottom:12px}
-  #tab-supps .stk-timeline{position:relative;padding-left:24px}
+  #tab-supps .stk-timeline{position:relative;padding-left:22px}
   #tab-supps .stk-timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--protein),var(--fat));opacity:.45}
-  #tab-supps .stk-phase{position:relative;padding-bottom:14px}
+  #tab-supps .stk-phase{position:relative;padding-bottom:10px}
   #tab-supps .stk-phase:last-child{padding-bottom:0}
-  #tab-supps .stk-node{position:absolute;left:-24px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);display:grid;place-items:center}
-  #tab-supps .stk-node::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 9px var(--accent)}
-  #tab-supps .stk-phase.active .stk-node{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
-  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-  #tab-supps .stk-time{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--accent)}
-  #tab-supps .stk-phase-name{font-size:11px;color:var(--faint);font-weight:500}
-  #tab-supps .stk-now-tag{font-family:var(--ff-num);font-size:8.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);background:var(--accent);padding:2px 6px;border-radius:4px;line-height:1}
-  #tab-supps .stk-items{display:flex;flex-direction:column;gap:5px}
-  #tab-supps .stk-item{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:9px 11px;transition:background .2s,opacity .25s}
+  #tab-supps .stk-node{position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);display:grid;place-items:center}
+  #tab-supps .stk-node::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 9px var(--accent)}
+  #tab-supps .stk-phase.active .stk-node{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+  #tab-supps .stk-time{font-family:var(--ff-num);font-size:10px;font-weight:600;color:var(--accent)}
+  #tab-supps .stk-phase-name{font-size:10px;color:var(--faint);font-weight:500}
+  #tab-supps .stk-now-tag{font-family:var(--ff-num);font-size:8px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);background:var(--accent);padding:1px 5px;border-radius:4px;line-height:1}
+  #tab-supps .stk-items{display:flex;flex-direction:column;gap:3px}
+  #tab-supps .stk-item{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:6px 9px;transition:background .2s,opacity .25s}
   #tab-supps .stk-item:active{background:var(--surface-2)}
-  #tab-supps .stk-check{flex:0 0 auto;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--border);background:transparent;cursor:pointer;position:relative;transition:border-color .2s,background .2s;padding:0}
-  #tab-supps .stk-check svg{position:absolute;inset:0;margin:auto;width:11px;height:11px;stroke:var(--bg);stroke-width:3.4;fill:none;opacity:0;transition:opacity .15s}
+  #tab-supps .stk-check{flex:0 0 auto;width:16px;height:16px;border-radius:5px;border:1.5px solid var(--border);background:transparent;cursor:pointer;position:relative;transition:border-color .2s,background .2s;padding:0}
+  #tab-supps .stk-check svg{position:absolute;inset:0;margin:auto;width:10px;height:10px;stroke:var(--bg);stroke-width:3.4;fill:none;opacity:0;transition:opacity .15s}
   #tab-supps .stk-check:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  #tab-supps .stk-name{font-family:var(--ff-ui);font-size:14px;font-weight:600;letter-spacing:-.01em;color:var(--text);flex:0 0 auto}
-  #tab-supps .stk-with{font-size:11px;color:var(--faint);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  #tab-supps .stk-dose{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent);padding:2px 7px;border-radius:6px;white-space:nowrap;flex:0 0 auto}
+  #tab-supps .stk-name{font-family:var(--ff-ui);font-size:12px;font-weight:600;letter-spacing:-.01em;color:var(--text);flex:0 0 auto}
+  #tab-supps .stk-with{font-size:10px;color:var(--faint);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #tab-supps .stk-dose{font-family:var(--ff-num);font-size:10px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent);padding:1px 6px;border-radius:5px;white-space:nowrap;flex:0 0 auto}
   #tab-supps .stk-item.done{opacity:.45}
   #tab-supps .stk-item.done .stk-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
   #tab-supps .stk-check.on{background:var(--accent);border-color:var(--accent)}
   #tab-supps .stk-check.on svg{opacity:1}
-  #tab-supps .stk-footer{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
-  #tab-supps .stk-allbtn{margin:8px 0 2px;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--ff-num);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:8px;cursor:pointer}
+  #tab-supps .stk-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+  #tab-supps .stk-allbtn{margin:4px 0 0;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--ff-num);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:7px;cursor:pointer}
   #tab-supps .stk-allbtn:active{background:var(--surface-2)}
   #tab-supps .stk-allbtn.done{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
   #tab-supps .stk-datestamp{font-family:var(--ff-num);font-size:9.5px;color:var(--faint)}
@@ -644,33 +640,33 @@
   #tab-home .hero::before{content:"";position:absolute;top:-42%;left:50%;transform:translateX(-50%);width:360px;height:360px;background:radial-gradient(circle,rgba(30,144,245,.20),transparent 66%);pointer-events:none}
   #tab-home .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:34%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);pointer-events:none}
   #tab-home .hero:active{transform:scale(.995)}
-  #tab-home .hero-rings{display:flex;align-items:center;justify-content:center;gap:14px;position:relative;flex:1;min-height:0}
+  #tab-home .hero-rings{display:flex;align-items:center;justify-content:center;gap:20px;position:relative;flex:1;min-height:0}
   #tab-home .hero-cal{display:flex;flex-direction:column;align-items:center;flex:none;justify-content:center}
-  #tab-home .ring-wrap{position:relative;width:min(168px,40vw);height:min(168px,40vw);margin:0;flex:none}
+  #tab-home .ring-wrap{position:relative;width:min(210px,46vw);height:min(210px,46vw);margin:0;flex:none}
   #tab-home .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
   #tab-home .ring-track{fill:none;stroke:var(--surface-2);stroke-width:11}
   #tab-home .ring-prog{fill:none;stroke:var(--brand);stroke-width:11;stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1);filter:drop-shadow(0 0 6px rgba(30,144,245,.55))}
   #tab-home .ring-prog.over{stroke:var(--protein);filter:drop-shadow(0 0 6px rgba(255,77,109,.55))}
   #tab-home .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  #tab-home .ring-num{font-family:var(--ff-num);font-weight:800;font-size:43px;line-height:.92;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-  #tab-home .ring-goal{font-family:var(--ff-num);font-size:11.5px;color:var(--muted);margin-top:5px}
-  #tab-home .home-pill{display:block;width:max-content;margin:12px auto 0;font-family:var(--ff-num);font-size:11px;font-weight:700;color:var(--brand);background:rgba(30,144,245,.12);border:1px solid rgba(30,144,245,.32);padding:4px 11px;border-radius:20px;position:relative}
+  #tab-home .ring-num{font-family:var(--ff-num);font-weight:800;font-size:52px;line-height:.92;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  #tab-home .ring-goal{font-family:var(--ff-num);font-size:13px;color:var(--muted);margin-top:5px}
+  #tab-home .home-pill{display:block;width:max-content;margin:12px auto 0;font-family:var(--ff-num);font-size:11.5px;font-weight:700;color:var(--brand);background:rgba(30,144,245,.12);border:1px solid rgba(30,144,245,.32);padding:4px 11px;border-radius:20px;position:relative}
   #tab-home .home-pill.over{color:var(--protein);background:rgba(255,77,109,.12);border-color:rgba(255,77,109,.36)}
   #tab-home .home-pill:empty{display:none}
   /* macro mini rings - stacked beside calories */
-  #tab-home .mrings{display:flex;flex-direction:column;gap:8px;margin-top:0;position:relative;flex:none;padding-top:0;justify-content:center}
-  #tab-home .mring{display:flex;flex-direction:row;align-items:center;gap:9px}
-  #tab-home .mring-wrap{position:relative;width:46px;height:46px;flex:none}
+  #tab-home .mrings{display:flex;flex-direction:column;gap:10px;margin-top:0;position:relative;flex:none;padding-top:0;justify-content:center}
+  #tab-home .mring{display:flex;flex-direction:row;align-items:center;gap:11px}
+  #tab-home .mring-wrap{position:relative;width:58px;height:58px;flex:none}
   #tab-home .mring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
   #tab-home .mring-track{fill:none;stroke:var(--surface-2);stroke-width:5}
   #tab-home .mring-prog{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:125.66;stroke-dashoffset:125.66;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1)}
   #tab-home .mring-prog.p{stroke:var(--protein-dial)}
   #tab-home .mring-prog.c{stroke:var(--carbs)}
   #tab-home .mring-prog.f{stroke:var(--fat-dial)}
-  #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums}
+  #tab-home .mring-v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-num);font-weight:700;font-size:14px;color:var(--text);font-variant-numeric:tabular-nums}
   #tab-home .mring-txt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
-  #tab-home .mring-l{font-size:10.5px;color:var(--muted);letter-spacing:.02em;font-weight:600}
-  #tab-home .mring-left{display:inline-block;width:max-content;font-family:var(--ff-num);font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid transparent;line-height:1.3}
+  #tab-home .mring-l{font-size:12px;color:var(--muted);letter-spacing:.02em;font-weight:600}
+  #tab-home .mring-left{display:inline-block;width:max-content;font-family:var(--ff-num);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid transparent;line-height:1.3}
   #tab-home .mring-left:empty{display:none}
   #tab-home .mring-left.p{color:var(--protein-dial);background:color-mix(in srgb,var(--protein-dial) 13%,transparent);border-color:color-mix(in srgb,var(--protein-dial) 34%,transparent)}
   #tab-home .mring-left.c{color:var(--carbs);background:color-mix(in srgb,var(--carbs) 13%,transparent);border-color:color-mix(in srgb,var(--carbs) 34%,transparent)}
@@ -3694,6 +3690,34 @@
   }
 
   /* ---------- boot ---------- */
+  function initPortraitLock(){
+    if(!document.querySelector('link[rel="manifest"]')){
+      var manifest={
+        name:"MasApp",
+        short_name:"MasApp",
+        display:"standalone",
+        orientation:"portrait",
+        background_color:"#000000",
+        theme_color:"#000000",
+        start_url:location.href.split("#")[0]
+      };
+      var link=document.createElement("link");
+      link.rel="manifest";
+      link.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"}));
+      document.head.appendChild(link);
+    }
+    function lock(){
+      try{
+        if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(function(){});
+        else if(screen.lockOrientation) screen.lockOrientation("portrait");
+        else if(screen.mozLockOrientation) screen.mozLockOrientation("portrait");
+        else if(screen.msLockOrientation) screen.msLockOrientation("portrait");
+      }catch(e){}
+    }
+    lock();
+    document.addEventListener("click",lock,{once:true,passive:true});
+    window.addEventListener("orientationchange",lock);
+  }
   async function boot(){
     // One-time fresh start: wipe all saved app data once, then persist normally.
     try{
@@ -3740,6 +3764,7 @@
     renderHome();
     updateBadges();
   }
+  initPortraitLock();
   boot();
 })();
 </script>
