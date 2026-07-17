@@ -400,7 +400,8 @@
   .hheat-c.on{border-color:transparent}
   .hheat-c.hit{background:var(--blue);box-shadow:0 0 7px color-mix(in srgb,var(--blue) 55%,transparent)}
   .hheat-c.miss{background:var(--danger);box-shadow:0 0 7px color-mix(in srgb,var(--danger) 55%,transparent)}
-  .hbackup{display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;padding:2px 12px 0;margin-top:auto;transform:translateY(14px);flex:none}
+  .hbackup{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:transparent;border:none;padding:0 4px;flex:none}
+  #tab-home .hbackup .hcloud,#tab-home .hbackup .hdb{width:34px;height:28px}
   .hcloud,.hdb{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;background:transparent;border:none;border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;color:var(--faint);transition:color .2s,filter .2s}
   .hcloud svg{width:26px;height:26px;display:block}
   .hdb svg{width:23px;height:23px;display:block}
@@ -756,7 +757,7 @@
   #tab-home #hMPV.over i{color:var(--muted);font-weight:600}
   /* today checklist card */
   #tab-home .htoday{background:transparent;border:none;border-top:1px solid color-mix(in srgb,var(--border) 70%,transparent);border-radius:0;padding:14px 4px 0;margin:10px 6px 0;flex:none}
-  #tab-home .htoday-head{display:flex;align-items:center;gap:9px;margin-bottom:2px;padding:0 4px}
+  #tab-home .htoday-head{display:flex;align-items:center;gap:9px;margin-bottom:2px;padding:0 12px 0 4px}
   #tab-home .htoday-title{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;flex:none}
   #tab-home .htoday-list{display:flex;flex-direction:column;gap:0}
   #tab-home .htd-row{position:relative;display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:transparent;border:none;border-radius:0;padding:11px 4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .1s;color:var(--text);font-family:var(--ff-ui)}
@@ -779,8 +780,8 @@
   #tab-home .htoday-count{display:flex;flex-direction:column;align-items:center;gap:1px;flex:none;margin-left:auto}
   #tab-home .htoday-count b{font-family:var(--ff-num);font-size:11px;font-weight:800;color:var(--brand);line-height:1}
   #tab-home .htoday-count span{font-size:6px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;line-height:1}
-  #tab-home .htoday-seg{flex:1;display:flex;gap:3px;min-width:28px;max-width:130px}
-  #tab-home .htd-seg-i{flex:1;height:3px;border-radius:2px;background:var(--surface-2)}
+  #tab-home .htoday-seg{flex:1;display:flex;gap:3px;min-width:24px;max-width:132px}
+  #tab-home .htd-seg-i{flex:1;height:2.5px;border-radius:2px;background:var(--surface-2)}
   #tab-home .htd-seg-i.on{background:var(--brand);box-shadow:0 0 5px color-mix(in srgb,var(--brand) 50%,transparent)}
   #tab-home .htoday-ring{position:relative;width:23px;height:23px;flex:none}
   #tab-home .htoday-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -788,7 +789,8 @@
   #tab-home .htoday-ring-p{fill:none;stroke:var(--brand);stroke-width:6;stroke-linecap:round;stroke-dasharray:113.1;stroke-dashoffset:113.1;transition:stroke-dashoffset .8s cubic-bezier(.34,.9,.3,1)}
   #tab-home .htoday-ring span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--ff-num);font-size:6.5px;font-weight:800;color:var(--brand)}
   /* home weight card */
-  #tab-home .hweight{background:transparent;border:none;border-top:1px solid color-mix(in srgb,var(--border) 70%,transparent);border-radius:0;padding:13px 10px 4px;margin:6px 6px 0;display:flex;align-items:center;gap:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .1s;flex:none}
+  #tab-home .hbottom{display:flex;align-items:center;gap:6px;border-top:1px solid color-mix(in srgb,var(--border) 70%,transparent);margin:6px 6px 0;flex:none}
+  #tab-home .hweight{flex:1;min-width:0;background:transparent;border:none;border-radius:0;padding:13px 10px 4px;margin:0;display:flex;align-items:center;gap:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .1s}
   #tab-home .hweight:active{opacity:.6}
   #tab-home .hw-left{flex:none;display:flex;flex-direction:column;gap:3px;min-width:0}
   #tab-home .hw-title{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
@@ -998,6 +1000,7 @@
       <div class="htoday-list" id="hToday"></div>
     </div>
 
+    <div class="hbottom">
     <div class="hweight" id="hWeight" data-goto="body">
       <div class="hw-left">
         <span class="hw-title">Weight</span>
@@ -1020,6 +1023,7 @@
       <button type="button" class="hdb" id="hDb" aria-label="Database connection status">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
       </button>
+    </div>
     </div>
   </div>
 
