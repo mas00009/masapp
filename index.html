@@ -25,13 +25,14 @@
     --muted:#7E8598;
     --faint:#4E5464;
     --protein:#FF4D6D;   /* the red (app accent) */
-    --protein-dial:#9B7DFF;  /* protein macro dial + dot (not red) */
-    --fat-dial:#2DD4BF;      /* fat macro dial + dot (not blue) */
+    --protein-dial:#A855F7;  /* protein macro dial + dot (purple) */
+    --fat-dial:#10B981;      /* fat macro dial + dot (emerald) */
     --carbs:#FFB43D;
     --supp:#6366F1;      /* supplements accent */
     --water:#22D3EE;     /* water accent */
-    --fat:#1E90F5;       /* the blue */
-    --blue:#1E90F5;
+    --brand:#0A84FF;     /* electric blue (app-wide) */
+    --blue:var(--brand);
+    --fat:var(--brand);
     --danger:#FF5470;
     --ok:#3DE08A;
     --h-morning:#FFB43D;
@@ -123,19 +124,24 @@
   .fuel{position:relative;height:50px;border-radius:14px;background:var(--surface-2);overflow:hidden;
     box-shadow:inset 0 0 0 1px var(--border);margin-bottom:12px}
   .fuel-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--blue);
-    box-shadow:0 0 20px rgba(30,144,245,.4);transition:width .55s cubic-bezier(.4,0,.2,1),background .3s,box-shadow .3s}
+    box-shadow:0 0 20px color-mix(in srgb,var(--blue) 40%,transparent);transition:width .55s cubic-bezier(.4,0,.2,1),background .3s,box-shadow .3s}
   .fuel-fill::after{content:"";position:absolute;right:0;top:0;bottom:0;width:26px;pointer-events:none;
     background:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,.5) 100%)}
-  .fuel-fill.over{background:var(--danger);box-shadow:0 0 20px rgba(255,77,109,.4)}
-  .fuel-fill.complete{background:var(--ok);box-shadow:0 0 20px rgba(61,224,138,.4)}
-  #suppFill,#suppFill.complete,#suppFill.over{background:var(--supp);box-shadow:0 0 20px color-mix(in srgb,var(--supp) 40%,transparent)}
+  .fuel-fill.over:not(#kcalFill){background:var(--danger);box-shadow:0 0 20px rgba(255,77,109,.4)}
+  .fuel-fill.complete:not(#kcalFill):not(#suppFill){background:var(--ok);box-shadow:0 0 20px rgba(61,224,138,.4)}
+  #kcalFill,#kcalFill.complete,#kcalFill.over{background:var(--blue);box-shadow:0 0 20px color-mix(in srgb,var(--blue) 40%,transparent)}
+  #suppFill,#suppFill.complete,#suppFill.over{background:var(--blue);box-shadow:0 0 20px color-mix(in srgb,var(--blue) 40%,transparent)}
   .fuel-content{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 15px}
+  .fuel-left{display:flex;align-items:center;gap:9px;min-width:0}
+  .fuel-ico{width:22px;height:22px;flex:none;display:block;color:#fff;filter:drop-shadow(0 1px 6px rgba(0,0,0,.4))}
   .fuel-num{font-family:var(--ff-num);font-weight:800;font-size:24px;line-height:1;letter-spacing:-.02em;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.45)}
   .fuel-num span{font-size:11px;font-weight:500;color:rgba(255,255,255,.72);margin-left:4px;text-shadow:none}
   .fuel-right{text-align:right;line-height:1.12}
   .fuel-rem{font-family:var(--ff-num);font-weight:800;font-size:24px;line-height:1;letter-spacing:-.02em;color:var(--text);text-shadow:0 1px 6px rgba(0,0,0,.4)}
   .fuel-rem span{font-size:11px;font-weight:500;color:var(--muted);margin-left:4px}
-  .fuel-rem.over{color:#fff} .fuel-rem.over span{color:rgba(255,255,255,.75)}
+  .fuel-rem.good{color:var(--ok)} .fuel-rem.good span{color:color-mix(in srgb,var(--ok) 72%,var(--muted))}
+  .fuel-rem.over{color:var(--danger)} .fuel-rem.over span{color:color-mix(in srgb,var(--danger) 72%,var(--muted))}
+  #suppRem.complete,#suppRem.complete span{color:#fff;font-size:24px;font-weight:800;text-shadow:0 1px 8px rgba(0,0,0,.45);margin-left:0}
 
   /* macro dials */
   .macros{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:8px}
@@ -354,38 +360,39 @@
   .tabbtn:active{background:var(--surface)}
 
   /* supps: The Stack */
-  #tab-supps .stk-timeline{position:relative}
-  #tab-supps .stk-phase{position:relative;padding-bottom:10px}
-  #tab-supps .stk-phase:last-child{padding-bottom:0}
-  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-  #tab-supps .stk-time{font-family:var(--ff-num);font-size:10px;font-weight:600;color:var(--accent)}
-  #tab-supps .stk-phase-name{font-size:10px;color:var(--faint);font-weight:500}
-  #tab-supps .stk-now-tag{font-family:var(--ff-num);font-size:8px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);background:var(--accent);padding:1px 5px;border-radius:4px;line-height:1}
-  #tab-supps .stk-items{display:flex;flex-direction:column;gap:3px}
-  #tab-supps .stk-item{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:6px 9px;transition:background .2s,opacity .25s}
-  #tab-supps .stk-item:active{background:var(--surface-2)}
-  #tab-supps .stk-check{flex:0 0 auto;width:16px;height:16px;border-radius:5px;border:1.5px solid var(--border);background:transparent;cursor:pointer;position:relative;transition:border-color .2s,background .2s;padding:0}
-  #tab-supps .stk-check svg{position:absolute;inset:0;margin:auto;width:10px;height:10px;stroke:var(--bg);stroke-width:3.4;fill:none;opacity:0;transition:opacity .15s}
-  #tab-supps .stk-check:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  #tab-supps .stk-name{font-family:var(--ff-ui);font-size:12px;font-weight:600;letter-spacing:-.01em;color:var(--text);flex:0 0 auto}
-  #tab-supps .stk-with{font-size:10px;color:var(--faint);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  #tab-supps .stk-dose{font-family:var(--ff-num);font-size:10px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent);padding:1px 6px;border-radius:5px;white-space:nowrap;flex:0 0 auto}
-  #tab-supps .stk-item.done{opacity:.45}
+  #tab-supps{--accent:var(--blue)}
+  #tab-supps .stk-timeline{position:relative;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:8px}
+  #tab-supps .stk-phase{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:9px;overflow:hidden}
+  #tab-supps .stk-phase:last-child{margin-bottom:0}
+  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--border)}
+  #tab-supps .stk-phase-name{font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;flex:1;min-width:0;color:var(--text)}
+  #tab-supps .stk-time{font-family:var(--ff-num);font-size:11px;font-weight:500;color:var(--muted);flex:none;white-space:nowrap}
+  #tab-supps .stk-now-tag{font-family:var(--ff-num);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);background:color-mix(in srgb,var(--blue) 14%,transparent);padding:3px 7px;border-radius:6px;line-height:1;flex:none}
+  #tab-supps .stk-items{display:flex;flex-direction:column;padding:0 7px}
+  #tab-supps .stk-item{display:flex;align-items:center;gap:10px;background:transparent;border:none;border-top:1px solid var(--border);border-radius:0;padding:9px 6px;transition:opacity .25s}
+  #tab-supps .stk-item:first-child{border-top:none}
+  #tab-supps .stk-item:active{opacity:.7}
+  #tab-supps .stk-check{flex:0 0 auto;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--border);background:transparent;cursor:pointer;position:relative;transition:border-color .2s,background .2s;padding:0}
+  #tab-supps .stk-check svg{position:absolute;inset:0;margin:auto;width:11px;height:11px;stroke:var(--bg);stroke-width:3.4;fill:none;opacity:0;transition:opacity .15s}
+  #tab-supps .stk-check:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  #tab-supps .stk-name{font-family:var(--ff-ui);font-size:13px;font-weight:500;letter-spacing:0;color:var(--text);flex:0 0 auto}
+  #tab-supps .stk-with{font-family:var(--ff-num);font-size:11px;color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #tab-supps .stk-dose{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--blue);background:color-mix(in srgb,var(--blue) 13%,transparent);padding:2px 7px;border-radius:6px;white-space:nowrap;flex:0 0 auto;font-variant-numeric:tabular-nums}
+  #tab-supps .stk-item.done{opacity:.5}
   #tab-supps .stk-item.done .stk-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
-  #tab-supps .stk-check.on{background:var(--accent);border-color:var(--accent)}
+  #tab-supps .stk-check.on{background:var(--blue);border-color:var(--blue)}
   #tab-supps .stk-check.on svg{opacity:1}
-  #tab-supps .stk-allbtn{margin:4px 0 0;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--ff-num);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:7px;cursor:pointer}
+  #tab-supps .stk-allbtn{display:block;width:calc(100% - 14px);margin:4px 7px 7px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:var(--ff-ui);font-weight:600;font-size:11px;letter-spacing:.02em;text-transform:none;padding:8px 10px;border-radius:8px;cursor:pointer}
   #tab-supps .stk-allbtn:active{background:var(--surface-2)}
-  #tab-supps .stk-allbtn.done{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
-  #tab-supps .stk-empty{color:var(--faint);font-size:13px;text-align:center;padding:26px 10px;line-height:1.6}
+  #tab-supps .stk-allbtn.done{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,var(--border))}
+  #tab-supps .stk-empty{color:var(--faint);font-size:12.5px;text-align:center;padding:26px 10px;line-height:1.6}
   #tab-supps.active{
     display:flex;flex-direction:column;overflow:hidden;
     height:calc(100dvh - 80px - env(safe-area-inset-bottom));
     max-height:calc(100dvh - 80px - env(safe-area-inset-bottom));
   }
   #tab-supps .apphead{flex:none}
-  #tab-supps .summary{flex:none}
-  #tab-supps .stk-timeline{flex:1;min-height:0;overflow:hidden}
+  #tab-supps .summary{flex:none;margin-bottom:9px}
 
   /* home: adherence heatmap + backup strip */
   .hheat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin-top:0;flex:none}
@@ -417,7 +424,7 @@
   #stackList .se-main{flex:1;min-width:0}
   #stackList .se-nm{font-size:14px;font-weight:600}
   #stackList .se-sub{font-family:var(--ff-num);font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #stackList .se-dose{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--supp);flex:none}
+  #stackList .se-dose{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--blue);flex:none}
   #stackList .se-chev{color:var(--faint);flex:none}
 
   html:has(#tab-home.active,#tab-body.active,#tab-supps.active),
@@ -691,7 +698,7 @@
 
   /* home dashboard */
   #tab-home.active{
-    display:flex;flex-direction:column;gap:6px;overflow:hidden;
+    display:flex;flex-direction:column;gap:4px;overflow:hidden;
     height:calc(100dvh - 80px - env(safe-area-inset-bottom));
     max-height:calc(100dvh - 80px - env(safe-area-inset-bottom));
     background:#000;
@@ -709,7 +716,6 @@
   #tab-home .brand-mark{display:flex;align-items:center;justify-content:center}
   #tab-home .brand-logo{height:32px;width:auto;display:block}
   /* hero ring */
-  #tab-home{--brand:#1E90F5}
   #tab-home .hero{position:relative;background:#000;border:none;border-radius:20px;padding:22px 12px 6px;margin-bottom:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:none;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;isolation:isolate}
   #tab-home .hero::before{display:none}
   #tab-home .hero::after{display:none}
@@ -728,7 +734,7 @@
   #tab-home .ring-badge.c{width:clamp(20px,calc(var(--mring-size)*0.34),26px);height:clamp(20px,calc(var(--mring-size)*0.34),26px);background:color-mix(in srgb,var(--carbs) 20%,var(--surface));border:1.5px solid color-mix(in srgb,var(--carbs) 55%,var(--border));color:var(--carbs);box-shadow:0 0 12px color-mix(in srgb,var(--carbs) 40%,transparent),0 3px 8px rgba(0,0,0,.35)}
   #tab-home .ring-badge.f{width:clamp(20px,calc(var(--mring-size)*0.34),26px);height:clamp(20px,calc(var(--mring-size)*0.34),26px);background:color-mix(in srgb,var(--fat-dial) 20%,var(--surface));border:1.5px solid color-mix(in srgb,var(--fat-dial) 55%,var(--border));color:var(--fat-dial);box-shadow:0 0 12px color-mix(in srgb,var(--fat-dial) 40%,transparent),0 3px 8px rgba(0,0,0,.35)}
   #tab-home .ring-track{fill:none;stroke:var(--surface-2);stroke-width:11}
-  #tab-home .ring-prog{fill:none;stroke:var(--brand);stroke-width:11;stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1);filter:drop-shadow(0 0 6px rgba(30,144,245,.55))}
+  #tab-home .ring-prog{fill:none;stroke:var(--brand);stroke-width:11;stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset 1.05s cubic-bezier(.34,.9,.3,1);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--brand) 55%,transparent))}
   #tab-home .ring-prog.complete{stroke:var(--ok);filter:drop-shadow(0 0 6px rgba(61,224,138,.55))}
   #tab-home .ring-prog.over{stroke:var(--protein);filter:drop-shadow(0 0 6px rgba(255,77,109,.55))}
   #tab-home .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 8px;transform:translateY(4px)}
@@ -767,6 +773,7 @@
   #tab-home .htd-check svg{width:10px;height:10px;opacity:0;stroke:#fff;stroke-width:3.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
   #tab-home .htd-row.done .htd-check{background:currentColor;border-color:currentColor;box-shadow:0 0 8px color-mix(in srgb,currentColor 50%,transparent)}
   #tab-home .htd-row.done .htd-check svg{opacity:1}
+  #tab-home .htd-row.light.done .htd-check svg{stroke:var(--bg)}
   #tab-home .htd-row.over .htd-check{background:var(--danger);border-color:var(--danger);box-shadow:0 0 8px color-mix(in srgb,var(--danger) 50%,transparent)}
   #tab-home .htd-row.over .htd-check svg{opacity:1}
   #tab-home .htd-ico{flex:none;width:19px;height:19px;display:grid;place-items:center}
@@ -778,19 +785,19 @@
   #tab-home .htd-pct{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
   #tab-home .htd-chev{width:13px;height:13px;flex:none;stroke:var(--faint);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
   #tab-home .htoday-count{display:flex;flex-direction:column;align-items:center;gap:1px;flex:none;margin-left:auto}
-  #tab-home .htoday-count b{font-family:var(--ff-num);font-size:11px;font-weight:800;color:var(--brand);line-height:1}
+  #tab-home .htoday-count b{font-family:var(--ff-num);font-size:11px;font-weight:800;color:var(--blue);line-height:1}
   #tab-home .htoday-count span{font-size:6px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;line-height:1}
   #tab-home .htoday-seg{flex:1;display:flex;gap:3px;min-width:24px;max-width:132px}
   #tab-home .htd-seg-i{flex:1;height:2.5px;border-radius:2px;background:var(--surface-2)}
-  #tab-home .htd-seg-i.on{background:var(--brand);box-shadow:0 0 5px color-mix(in srgb,var(--brand) 50%,transparent)}
-  #tab-home .htoday-ring{position:relative;width:28px;height:28px;flex:none}
+  #tab-home .htd-seg-i.on{background:var(--blue)}
+  #tab-home .htoday-ring{position:relative;width:28px;height:28px;flex:none;color:var(--blue)}
   #tab-home .htoday-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
   #tab-home .htoday-ring-t{fill:none;stroke:var(--surface-2);stroke-width:5}
-  #tab-home .htoday-ring-p{fill:none;stroke:var(--brand);stroke-width:5;stroke-linecap:round;stroke-dasharray:113.1;stroke-dashoffset:113.1;transition:stroke-dashoffset .8s cubic-bezier(.34,.9,.3,1)}
-  #tab-home .htoday-ring span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--ff-num);font-size:7px;font-weight:800;color:var(--brand)}
+  #tab-home .htoday-ring-p{fill:none;stroke:var(--blue);stroke-width:5;stroke-linecap:round;stroke-dasharray:113.1;stroke-dashoffset:113.1;transition:stroke-dashoffset .8s cubic-bezier(.34,.9,.3,1)}
+  #tab-home .htoday-ring span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--ff-num);font-size:7px;font-weight:800;color:var(--blue)}
   /* home weight card */
-  #tab-home .hbottom{display:flex;align-items:center;gap:6px;border-top:1px solid color-mix(in srgb,var(--border) 70%,transparent);margin:6px 6px 0;flex:none}
-  #tab-home .hweight{flex:1;min-width:0;background:transparent;border:none;border-radius:0;padding:11px 10px;margin:0;display:flex;align-items:center;gap:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .1s}
+  #tab-home .hbottom{display:flex;align-items:center;gap:6px;border-top:1px solid color-mix(in srgb,var(--border) 70%,transparent);margin:0 6px 0;flex:none}
+  #tab-home .hweight{flex:1;min-width:0;background:transparent;border:none;border-radius:0;padding:5px 10px;margin:0;display:flex;align-items:center;gap:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .1s}
   #tab-home .hweight:active{opacity:.6}
   #tab-home .hw-left{flex:none;display:flex;flex-direction:column;gap:3px;min-width:0}
   #tab-home .hw-title{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
@@ -801,13 +808,13 @@
   #tab-home .hw-sub{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
   #tab-home .hw-right{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:4px}
   #tab-home .hw-spark{width:100%;height:40px;display:block;overflow:visible}
-  #tab-home .hw-spark .hw-line{fill:none;stroke:var(--brand);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 4px color-mix(in srgb,var(--brand) 45%,transparent))}
-  #tab-home .hw-spark .hw-area{fill:color-mix(in srgb,var(--brand) 13%,transparent);stroke:none}
+  #tab-home .hw-spark .hw-line{fill:none;stroke:var(--blue);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+  #tab-home .hw-spark .hw-area{fill:color-mix(in srgb,var(--blue) 13%,transparent);stroke:none}
   #tab-home .hw-goalrow{display:flex;align-items:baseline;justify-content:flex-end;gap:7px;flex-wrap:wrap}
   #tab-home .hw-goalrow:empty{display:none}
   #tab-home .hw-goal{font-family:var(--ff-num);font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right}
   #tab-home .hw-goal:empty{display:none}
-  #tab-home .hw-togoal{font-family:var(--ff-num);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--brand);text-align:right}
+  #tab-home .hw-togoal{font-family:var(--ff-num);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--blue);text-align:right}
   #tab-home .hw-togoal:empty{display:none}
   #tab-home .hbackup{padding:2px 10px 0}
 
@@ -847,8 +854,8 @@
 
   /* water */
   #tab-food .water{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 14px;margin-bottom:9px}
-  #tab-food .water .wd-ico{width:30px;height:30px;border-radius:9px;background:color-mix(in srgb,var(--water) 15%,transparent);display:grid;place-items:center;flex:none}
-  #tab-food .water .wd-ico svg{width:16px;height:16px;stroke:var(--water);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  #tab-food .water .wd-ico{width:30px;height:30px;border-radius:9px;background:color-mix(in srgb,var(--blue) 15%,transparent);display:grid;place-items:center;flex:none}
+  #tab-food .water .wd-ico svg{width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   #tab-food .water .wd-txt{flex:1;min-width:0}
   #tab-food .water .wd-v{font-family:var(--ff-num);font-size:15px;font-weight:700;color:var(--text)}
   #tab-food .water .wd-v small{font-size:10px;color:var(--muted);font-weight:500;margin-left:4px}
@@ -1045,7 +1052,7 @@
     <div class="fuel">
       <div class="fuel-fill" id="kcalFill" style="width:0%"></div>
       <div class="fuel-content">
-        <div class="fuel-num" id="kcalNow">0<span>kcal</span></div>
+        <div class="fuel-left"><svg class="fuel-ico" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg><div class="fuel-num" id="kcalNow">0<span>kcal</span></div></div>
         <div class="fuel-right">
           <div class="fuel-rem" id="kcalRem">-</div>
         </div>
@@ -1120,7 +1127,7 @@
       <div class="fuel">
         <div class="fuel-fill" id="suppFill"></div>
         <div class="fuel-content">
-          <div class="fuel-num" id="suppDone">0<span>taken</span></div>
+          <div class="fuel-left"><svg class="fuel-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.2" y="8.5" width="17.6" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M8.5 8.5l7 7"/></svg><div class="fuel-num" id="suppDone">0<span>taken</span></div></div>
           <div class="fuel-right">
             <div class="fuel-rem" id="suppRem">-</div>
           </div>
@@ -1782,15 +1789,16 @@
     var over = targets.cal>0 && calDiff > CAL_GRACE;
     var fill=document.getElementById("kcalFill");
     fill.style.width=Math.min(pct,100)+"%";
-    fill.classList.toggle("complete", calHit);
-    fill.classList.toggle("over", over);
     var remEl=document.getElementById("kcalRem");
     if(targets.cal>0){
       var rem = r0(targets.cal - t.cal);
-      if(rem>=0){ remEl.innerHTML=rem.toLocaleString()+" <span>left</span>"; remEl.classList.remove("over"); }
-      else{ remEl.innerHTML=Math.abs(rem).toLocaleString()+" <span>over</span>"; remEl.classList.toggle("over", !calHit); }
+      if(rem>=0){ remEl.innerHTML=rem.toLocaleString()+" <span>left</span>"; }
+      else{ remEl.innerHTML=Math.abs(rem).toLocaleString()+" <span>over</span>"; }
+      remEl.classList.toggle("good", calHit);
+      remEl.classList.toggle("over", over);
     } else {
-      remEl.innerHTML="<span>no target set</span>"; remEl.classList.remove("over");
+      remEl.innerHTML="<span>no target set</span>";
+      remEl.classList.remove("good","over");
     }
 
     // macro dials fill toward each goal
@@ -2959,6 +2967,10 @@
     var ap=h>=12?"PM":"AM";
     h=h%12; if(h===0) h=12;
     return h+":"+min+" "+ap;
+  }
+  function fmtPhaseTime(t){
+    if(!t) return "";
+    return String(t).replace(/\b0(\d):/g,"$1:");
   }
   function parseSchedTime24(t){
     var m=String(t||"12:00").match(/^(\d{1,2}):(\d{2})/);
@@ -4137,7 +4149,7 @@
     var calDone = targets.cal>0 && t.cal>0 && Math.abs(t.cal - targets.cal) <= CAL_GRACE;
     var calOver = targets.cal>0 && (t.cal - targets.cal) > CAL_GRACE;
     var calRight = "<span class='htd-pct'>"+(targets.cal>0 ? Math.abs(calRem).toLocaleString() : r0(t.cal).toLocaleString())+"</span>"+chev;
-    rows.push({done:calDone,over:calOver,color:"var(--brand)",goto:"food",
+    rows.push({done:calDone,over:calOver,color:"var(--blue)",goto:"food",
       ico:"<svg viewBox='0 0 24 24' fill='currentColor'><path d='M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z'/></svg>",
       title:"Calories Logged", sub:(targets.cal>0?"Goal: "+targets.cal.toLocaleString()+" kcal":"No target set"), right:calRight});
 
@@ -4159,9 +4171,9 @@
     var wPct = wTotal===0 ? 100 : Math.round(wDoneN/wTotal*100);
     var wSub = wTotal===0 ? "Rest day" : (wDoneN+" / "+wTotal+" completed");
     var wRight = "<span class='htd-pct'>"+(wTotal===0?"Rest":wPct+"%")+"</span>"+chev;
-    rows.push({done:wDone,color:"var(--ok)",goto:"plan",
+    rows.push({done:wDone,light:true,color:"var(--text)",goto:"plan",
       ico:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4.5' width='18' height='16' rx='2.5'/><path d='M3 9.5h18M8 2.5v4M16 2.5v4'/></svg>",
-      title:"Schedule", sub:wSub, right:wRight});
+      title:"Calendar", sub:wSub, right:wRight});
 
     // 4) Supplements - taken / total for today
     var sc=suppsTodayCount();
@@ -4169,7 +4181,7 @@
     var sDone = sTotal>0 ? sTaken>=sTotal : true;
     var sSub = sTotal>0 ? (sTaken+" / "+sTotal+" taken") : "Nothing due";
     var sRight = "<span class='htd-pct'>"+(sTotal>0 ? sTaken+"/"+sTotal : "Done")+"</span>"+chev;
-    rows.push({done:sDone,color:"var(--supp)",goto:"supps",
+    rows.push({done:sDone,light:true,color:"var(--text)",goto:"supps",
       ico:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7z'/><path d='M7 7l10 10'/></svg>",
       title:"Supplements", sub:sSub, right:sRight});
 
@@ -4179,12 +4191,12 @@
     var wDoneW=cups>=tgtCups;
     var wPctW=Math.min(100, Math.round(cups/tgtCups*100));
     function ltr(c){ var l=c*cup/1000; return (l%1?l.toFixed(1):l.toFixed(0)); }
-    rows.push({done:wDoneW,color:"var(--water)",goto:"food",
+    rows.push({done:wDoneW,light:true,color:"var(--text)",goto:"food",
       ico:"<svg viewBox='0 0 24 24' fill='currentColor'><path d='M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z'/></svg>",
       title:"Water", sub:ltr(cups)+" / "+ltr(tgtCups)+" litres", right:"<span class='htd-pct'>"+wPctW+"%</span>"+chev});
 
     box.innerHTML = rows.map(function(r){
-      var cls = r.over ? " over" : (r.done ? " done" : "");
+      var cls = (r.over ? " over" : (r.done ? " done" : "")) + (r.light ? " light" : "");
       var mark = r.over
         ? "<span class='htd-check'><svg viewBox='0 0 24 24'><path d='M6 6l12 12M18 6L6 18'/></svg></span>"
         : check();
@@ -4424,6 +4436,7 @@
   var timeline=document.getElementById('timeline');
 
   function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function fmtPhaseTime(t){ if(!t) return ""; return String(t).replace(/\b0(\d):/g,"$1:"); }
   function ls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
   function dkey(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
@@ -4437,7 +4450,7 @@
   function defaultStack(){
     var a=realToday;
     return { phases:[
-      { id:"morning", name:"Morning", start:6, time:"07:00–08:00 AM", accent:"var(--protein)", items:[
+      { id:"morning", name:"Morning", start:6, time:"7:00–8:00 AM", accent:"var(--protein)", items:[
         { id:uid(), name:"Vitamin D", dose:"1 cap", with:"breakfast + fat", note:"", freq:2, anchor:a },
         { id:uid(), name:"Ubiquinol", dose:"150 mg", with:"breakfast", note:"CoQ10", freq:1, anchor:a },
         { id:uid(), name:"Collagen Peptides", dose:"10 g", with:"with multivitamin", note:"tendons", freq:1, anchor:a },
@@ -4513,8 +4526,8 @@
           "<span class='stk-with'>"+esc(subtitle(it))+"</span>"+
           "<span class='stk-dose'>"+esc(it.dose||"")+"</span></div>";
       }).join("");
-      html+="<section class='stk-phase' data-start='"+ph.start+"' data-phase='"+ph.id+"' style='--accent:var(--supp)'>"+
-        "<div class='stk-phase-head'><span class='stk-time'>"+esc(ph.time||"")+"</span><span class='stk-phase-name'>"+esc(ph.name||"")+"</span></div>"+
+      html+="<section class='stk-phase' data-start='"+ph.start+"' data-phase='"+ph.id+"'>"+
+        "<div class='stk-phase-head'><span class='stk-phase-name'>"+esc(ph.name||"")+"</span><span class='stk-time'>"+esc(fmtPhaseTime(ph.time||""))+"</span></div>"+
         "<div class='stk-items'>"+items+"</div>"+
         "<button class='stk-allbtn' data-phase-all='"+ph.id+"'>Mark all taken</button></section>";
     });
@@ -4536,11 +4549,11 @@
     if(doneEl) doneEl.childNodes[0].nodeValue=String(done);
     var remEl=document.getElementById('suppRem');
     if(remEl){
-      if(!total) remEl.innerHTML='<span>nothing due</span>';
+      if(!total){ remEl.innerHTML='<span>nothing due</span>'; remEl.classList.remove('complete'); }
       else{
         var left=total-done;
-        if(left>0) remEl.innerHTML=left+' <span>left</span>';
-        else remEl.innerHTML='<span>all taken</span>';
+        if(left>0){ remEl.innerHTML=left+' <span>left</span>'; remEl.classList.remove('complete'); }
+        else{ remEl.innerHTML='<span>Taken</span>'; remEl.classList.add('complete'); }
       }
     }
     if(window.__updateBadges) window.__updateBadges();
@@ -4601,7 +4614,7 @@
     var box=document.getElementById('stackList'); if(!box) return;
     var html="";
     stack.phases.forEach(function(ph){
-      html+="<div class='se-phase'>"+esc(ph.name)+" · "+esc(ph.time||"")+"</div>";
+      html+="<div class='se-phase'>"+esc(ph.name)+" · "+esc(fmtPhaseTime(ph.time||""))+"</div>";
       if(!(ph.items||[]).length){ html+="<div class='mono-note' style='text-align:left;margin:0 4px 6px'>No supplements here yet.</div>"; return; }
       ph.items.forEach(function(it){
         var sub=[freqLabel(it.freq)||"every day"]; if(it.with) sub.push(it.with); if(it.note) sub.push(it.note);
