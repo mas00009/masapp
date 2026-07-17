@@ -117,7 +117,7 @@
 
   /* summary */
   .summary{
-    background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    background:#000;border:none;border-radius:16px;
     padding:14px 14px 12px;margin-bottom:11px;
   }
   /* calorie fuel gauge */
@@ -362,14 +362,14 @@
   /* supps: The Stack */
   #tab-supps{--accent:var(--blue)}
   #tab-supps .stk-timeline{position:relative;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:8px}
-  #tab-supps .stk-phase{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:9px;overflow:hidden}
+  #tab-supps .stk-phase{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:7px;overflow:hidden}
   #tab-supps .stk-phase:last-child{margin-bottom:0}
-  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--border)}
+  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--border)}
   #tab-supps .stk-phase-name{font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;flex:1;min-width:0;color:var(--text)}
   #tab-supps .stk-time{font-family:var(--ff-num);font-size:11px;font-weight:500;color:var(--muted);flex:none;white-space:nowrap}
   #tab-supps .stk-now-tag{font-family:var(--ff-num);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);background:color-mix(in srgb,var(--blue) 14%,transparent);padding:3px 7px;border-radius:6px;line-height:1;flex:none}
   #tab-supps .stk-items{display:flex;flex-direction:column;padding:0 7px}
-  #tab-supps .stk-item{display:flex;align-items:center;gap:10px;background:transparent;border:none;border-top:1px solid var(--border);border-radius:0;padding:9px 6px;transition:opacity .25s}
+  #tab-supps .stk-item{display:flex;align-items:center;gap:10px;background:transparent;border:none;border-top:1px solid var(--border);border-radius:0;padding:4px 6px;transition:opacity .25s}
   #tab-supps .stk-item:first-child{border-top:none}
   #tab-supps .stk-item:active{opacity:.7}
   #tab-supps .stk-check{flex:0 0 auto;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--border);background:transparent;cursor:pointer;position:relative;transition:border-color .2s,background .2s;padding:0}
@@ -382,7 +382,7 @@
   #tab-supps .stk-item.done .stk-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
   #tab-supps .stk-check.on{background:var(--blue);border-color:var(--blue)}
   #tab-supps .stk-check.on svg{opacity:1}
-  #tab-supps .stk-allbtn{display:block;width:calc(100% - 14px);margin:4px 7px 7px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:var(--ff-ui);font-weight:600;font-size:11px;letter-spacing:.02em;text-transform:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  #tab-supps .stk-allbtn{display:block;width:calc(100% - 14px);margin:3px 7px 5px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:var(--ff-ui);font-weight:600;font-size:11px;letter-spacing:.02em;text-transform:none;padding:6px 10px;border-radius:8px;cursor:pointer}
   #tab-supps .stk-allbtn:active{background:var(--surface-2)}
   #tab-supps .stk-allbtn.done{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,var(--border))}
   #tab-supps .stk-empty{color:var(--faint);font-size:12.5px;text-align:center;padding:26px 10px;line-height:1.6}
@@ -392,7 +392,7 @@
     max-height:calc(100dvh - 80px - env(safe-area-inset-bottom));
   }
   #tab-supps .apphead{flex:none}
-  #tab-supps .summary{flex:none;margin-bottom:9px}
+  #tab-supps .summary{flex:none;margin-bottom:7px}
 
   /* home: adherence heatmap + backup strip */
   .hheat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin-top:0;flex:none}
