@@ -1,9 +1,9 @@
 # MasApp
 
-A single-file, mobile-first health & fitness tracker PWA. Everything —
-markup, styles, and logic — lives in [`index.html`](index.html), with no
-build step and no backend. Data is persisted locally in the browser via
-`localStorage`.
+A mobile-first health & fitness tracker PWA. All markup, styles, and logic
+live in [`index.html`](index.html); images and icons live in
+[`assets/`](assets). There's no build step and no backend — data is
+persisted locally in the browser via `localStorage`.
 
 ## Features
 
@@ -19,15 +19,15 @@ build step and no backend. Data is persisted locally in the browser via
 
 ## Getting started
 
-Because it's a self-contained HTML file, there's nothing to install or
-build. Just open it:
+There's nothing to install or build. Just open it (keep `index.html` and
+the `assets/` folder together — the app loads its images from there):
 
 ```bash
 open index.html          # macOS
 # or double-click index.html in your file browser
 ```
 
-To use it as an installable app on a phone, host the file over HTTPS and
+To use it as an installable app on a phone, host the folder over HTTPS and
 "Add to Home Screen" from your mobile browser — it's configured as a
 standalone web app.
 
@@ -35,8 +35,8 @@ standalone web app.
 
 ```
 .
-├── index.html   # the entire app (UI + styles + logic)
-├── assets/      # icons and images
+├── index.html   # the app: UI + styles + logic
+├── assets/      # icons and images (app icon, brand logo, body figures)
 └── README.md
 ```
 
