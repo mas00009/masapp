@@ -1518,6 +1518,25 @@
         <button type="button" class="ghost" id="addFoodFromManage">+ Add a new food</button>
       </div>
     </div>
+
+    <div class="set-section">
+      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Reset</span><span class="set-chev">›</span></button>
+      <div class="set-body" hidden>
+        <div class="mono-note" style="text-align:left;margin:2px 2px 12px">Erases all your logged data on this device — foods, food log, targets, body, profile, schedule, workouts, plans, supplements and journal. Your AI key and sync connection are kept.</div>
+        <label for="resetCloud" style="display:flex;align-items:center;gap:8px;margin:0 2px 14px;font-size:13px;color:var(--muted)">
+          <input type="checkbox" id="resetCloud" checked>
+          <span>Also erase the cloud copy</span>
+        </label>
+        <button type="button" class="ghost" id="resetStart" style="color:var(--danger);border-color:var(--danger)">Reset all data</button>
+        <div id="resetConfirm" hidden style="margin-top:12px">
+          <div class="mono-note" style="text-align:left;margin:0 2px 8px;color:var(--danger)">This cannot be undone. Type RESET to confirm.</div>
+          <input type="text" id="resetType" placeholder="Type RESET" autocomplete="off" autocapitalize="characters" spellcheck="false" style="width:100%;box-sizing:border-box;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:12px 14px;font-family:var(--ff-ui);font-size:16px;outline:none;margin-bottom:10px">
+          <button type="button" class="primary" id="resetGo" disabled style="background:var(--danger);box-shadow:none;opacity:.45">Permanently erase everything</button>
+          <button type="button" class="ghost" id="resetCancel" style="margin-top:8px">Cancel</button>
+        </div>
+        <div class="mono-note" id="resetNote" style="text-align:left;margin:10px 2px 0"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4303,6 +4322,49 @@
   window.__renderBackupStatus=renderBackupStatus;
   window.addEventListener("online", renderBackupStatus);
   window.addEventListener("offline", renderBackupStatus);
+
+  /* ---------- reset all data (device + optional cloud) ---------- */
+  function wipeLocalData(){
+    // keep secrets + connection so the app stays usable; wipe every data key
+    var keep={"mt_aikey":1,"mt_aimodel":1,"mt_ai_custom_models":1,"mt_syncurl":1,"mt_synctoken":1,"mt_syncauto":1,"mt_freshreset_2":1};
+    try{
+      var kill=[];
+      for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i);
+        if(k && !keep[k] && (k.indexOf("mt_")===0 || k.indexOf("stack-")===0)) kill.push(k); }
+      kill.forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+    }catch(e){}
+  }
+  (function wireReset(){
+    var startBtn=document.getElementById("resetStart"), confirmBox=document.getElementById("resetConfirm"),
+        typeInp=document.getElementById("resetType"), goBtn=document.getElementById("resetGo"),
+        cancelBtn=document.getElementById("resetCancel"), note=document.getElementById("resetNote");
+    if(!startBtn) return;
+    function resetUI(){ confirmBox.hidden=true; typeInp.value=""; goBtn.disabled=true; goBtn.style.opacity=".45"; startBtn.hidden=false; if(note) note.textContent=""; }
+    startBtn.addEventListener("click",function(){ startBtn.hidden=true; confirmBox.hidden=false; typeInp.value=""; typeInp.focus(); });
+    cancelBtn.addEventListener("click",resetUI);
+    typeInp.addEventListener("input",function(){
+      var ok=this.value.trim().toUpperCase()==="RESET";
+      goBtn.disabled=!ok; goBtn.style.opacity=ok?"1":".45";
+    });
+    goBtn.addEventListener("click",async function(){
+      if(typeInp.value.trim().toUpperCase()!=="RESET") return;   // final guard
+      goBtn.disabled=true; goBtn.textContent="Erasing…";
+      var wantCloud=document.getElementById("resetCloud").checked && window.__syncConfigured && window.__syncConfigured();
+      if(wantCloud){
+        if(note) note.textContent="Erasing cloud copy…";
+        var res=await window.__wipeCloud();
+        if(!res || !res.ok){
+          // don't wipe local if the cloud wipe failed — avoids auto-sync repopulating it
+          if(note){ note.style.color="var(--danger)"; note.textContent="Cloud wipe failed"+(res&&res.status?(" ("+res.status+")"):"")+". Nothing was erased. Check your sync settings."; }
+          goBtn.disabled=false; goBtn.textContent="Permanently erase everything";
+          return;
+        }
+      }
+      wipeLocalData();
+      if(note) note.textContent="Done. Reloading…";
+      setTimeout(function(){ location.reload(); }, 500);
+    });
+  })();
   // Adherence heatmap: trained / calorie target / supps over the last 14 days.
   function renderHeatmap(){
     var box=document.getElementById("hHeat"); if(!box) return;
@@ -4966,6 +5028,17 @@
     }catch(e){}
   }
 
+  window.__syncConfigured=function(){ return !!cfg(); };
+  // Overwrite the cloud copy with an empty snapshot. Correctness depends on the
+  // Worker replacing its stored value on POST /data (vs merging) — confirm in the
+  // Worker source. Returns {ok, status?, reason?}.
+  window.__wipeCloud=async function(){
+    var c=cfg(); if(!c) return {ok:false, reason:"not-configured"};
+    try{
+      var r=await fetch(c.url+"/data",{method:"POST",headers:hdr(c),body:JSON.stringify({v:2,data:{},updated:{}})});
+      return {ok:r.ok, status:r.status};
+    }catch(e){ return {ok:false, reason:e.message}; }
+  };
   function init(){
     var u=document.getElementById("syncUrl"), t=document.getElementById("syncToken"),
         a=document.getElementById("syncAuto");
