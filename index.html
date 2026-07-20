@@ -2357,15 +2357,27 @@
 
   /* ---------- add methods: scan, find, label, estimate ---------- */
   function setStatus(msg,cls){ var s=document.getElementById("methodStatus"); s.textContent=msg||""; s.className="method-status"+(cls?" "+cls:""); }
-  function showManualForm(show){
+  function showManualForm(show, opts){
+    opts=opts||{};
     var box=document.getElementById("nfManual"), btn=document.getElementById("mManual");
     if(box) box.hidden=!show;
     if(btn) btn.classList.toggle("on", !!show);
     if(show){
       setTimeout(function(){
-        if(box) box.scrollIntoView({behavior:"smooth",block:"nearest"});
-        var n=document.getElementById("nfName"); if(n) n.focus();
-      }, 60);
+        if(opts.toEnd){
+          // AI filled the form: scroll the sheet to the bottom so the
+          // "Add to meal" button is visible; don't pop the keyboard
+          var sb=document.querySelector("#addSheet .sheet-body");
+          if(sb){
+            var toBottom=function(){ sb.scrollTop=sb.scrollHeight; };
+            toBottom();                                   // instant, reliable
+            requestAnimationFrame(function(){ toBottom(); requestAnimationFrame(toBottom); });
+          } else if(box) box.scrollIntoView({behavior:"smooth",block:"nearest"});
+        } else {
+          if(box) box.scrollIntoView({behavior:"smooth",block:"nearest"});
+          var n=document.getElementById("nfName"); if(n) n.focus();
+        }
+      }, 80);
     }
   }
   /* ---- amount to log: grams <-> servings, scaling the per-serving macros ---- */
@@ -2419,7 +2431,7 @@
     document.getElementById("nfC").value=(o.c!=null&&isFinite(o.c))?r1(o.c):"";
     document.getElementById("nfF").value=(o.f!=null&&isFinite(o.f))?r1(o.f):"";
     configureAmount((o.servingG&&o.servingG>0)?o.servingG:parseServingGrams(o.serving));
-    showManualForm(true);
+    showManualForm(true, {toEnd:true});
   }
   document.getElementById("nfUnitG").addEventListener("click",function(){ setNfUnit("g"); });
   document.getElementById("nfUnitServ").addEventListener("click",function(){ setNfUnit("serv"); });
