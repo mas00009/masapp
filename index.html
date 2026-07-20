@@ -1358,7 +1358,7 @@
 <div class="sheet" id="addSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2 id="addTitle">Add to breakfast</h2>
+    <h2 id="addTitle">Add to Breakfast</h2>
     <button class="close" data-close>Done</button>
   </div>
   <div class="search">
@@ -1380,7 +1380,7 @@
   <div class="sheet-body">
     <div id="foodList"></div>
     <div class="newfood">
-      <div class="subhead">Add new food</div>
+      <div class="subhead">Add New Food</div>
       <div class="methods">
         <button class="method" id="mMeal"><span class="mic">✦</span>AI estimate</button>
         <button class="method" id="mManual"><span class="mic">✎</span>Enter it yourself</button>
@@ -1456,7 +1456,7 @@
     </div>
 
     <div class="set-section">
-      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Daily targets</span><span class="set-chev">›</span></button>
+      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Daily Targets</span><span class="set-chev">›</span></button>
       <div class="set-body" hidden>
         <div class="grid4" style="margin:0 2px 6px">
           <div class="field"><label>Kcal</label><input type="number" inputmode="numeric" id="tCal"></div>
@@ -1484,7 +1484,7 @@
     </div>
 
     <div class="set-section">
-      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>AI features</span><span class="set-chev">›</span></button>
+      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>AI Features</span><span class="set-chev">›</span></button>
       <div class="set-body" hidden>
         <div class="field" style="margin:0 2px 10px"><label>OpenRouter API key</label><input type="password" id="aiKey" placeholder="sk-or-..." autocomplete="off"></div>
         <div class="field" style="margin:0 2px 10px"><label>Model</label><select id="aiModelPick"></select></div>
@@ -1495,7 +1495,7 @@
     </div>
 
     <div class="set-section">
-      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Backup &amp; sync</span><span class="set-chev">›</span></button>
+      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Backup &amp; Sync</span><span class="set-chev">›</span></button>
       <div class="set-body" hidden>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 2px">
           <button type="button" class="ghost" id="exportData" style="margin-top:0">Export data</button>
@@ -1516,7 +1516,7 @@
     </div>
 
     <div class="set-section">
-      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Your foods</span><span class="set-chev">›</span></button>
+      <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Your Foods</span><span class="set-chev">›</span></button>
       <div class="set-body" hidden>
         <div id="manageList"></div>
         <button type="button" class="ghost" id="addFoodFromManage">+ Add a new food</button>
@@ -1550,7 +1550,7 @@
 <div class="sheet" id="editSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2 id="editTitle">Edit food</h2>
+    <h2 id="editTitle">Edit Food</h2>
     <button class="close" data-close>Cancel</button>
   </div>
   <div class="sheet-body">
@@ -1594,7 +1594,7 @@
 <div class="sheet" id="scheduleSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2 id="schHeading">Add session</h2>
+    <h2 id="schHeading">Add Session</h2>
     <button class="close" data-close>Cancel</button>
   </div>
   <div class="sheet-body">
@@ -1643,7 +1643,7 @@
 <div class="sheet" id="exSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2>Add exercise</h2>
+    <h2>Add Exercise</h2>
     <button class="close" data-close>Cancel</button>
   </div>
   <div class="sheet-body">
@@ -1655,7 +1655,7 @@
 <div class="sheet" id="plansSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2>Workout plans</h2>
+    <h2>Workout Plans</h2>
     <button class="close" data-close>Close</button>
   </div>
   <div class="sheet-body">
@@ -1668,7 +1668,7 @@
 <div class="sheet" id="planEditSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2 id="planEditHeading">New plan</h2>
+    <h2 id="planEditHeading">New Plan</h2>
     <button class="close" data-close>Cancel</button>
   </div>
   <div class="sheet-body">
@@ -1688,7 +1688,7 @@
 <div class="sheet" id="stackSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2>Edit your stack</h2>
+    <h2>Edit Your Stack</h2>
     <button class="close" data-close>Done</button>
   </div>
   <div class="sheet-body">
@@ -1701,7 +1701,7 @@
 <div class="sheet" id="stackItemSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
   <div class="sheet-head">
-    <h2 id="stackItemHeading">Add supplement</h2>
+    <h2 id="stackItemHeading">Add Supplement</h2>
     <button class="close" data-close>Cancel</button>
   </div>
   <div class="sheet-body">
@@ -2103,11 +2103,11 @@
 
   function openStats(mode){
     var title, html;
-    if(mode==="body"){ title="Body trends"; html=buildBodyStats(); }
-    else if(mode==="supps"){ title="Supplement trends"; html=buildSuppStats(); }
-    else if(mode==="lift"){ title="Training trends"; html=buildLiftStats(); }
-    else if(mode==="plan"){ title="Activity trends"; html=buildPlanStats(); }
-    else { title="Nutrition trends"; html=buildFoodStats(); }
+    if(mode==="body"){ title="Body Trends"; html=buildBodyStats(); }
+    else if(mode==="supps"){ title="Supplement Trends"; html=buildSuppStats(); }
+    else if(mode==="lift"){ title="Training Trends"; html=buildLiftStats(); }
+    else if(mode==="plan"){ title="Activity Trends"; html=buildPlanStats(); }
+    else { title="Nutrition Trends"; html=buildFoodStats(); }
     document.getElementById("statsTitle").textContent=title;
     document.getElementById("statsBody").innerHTML=html;
     openSheet("statsSheet");
@@ -2154,7 +2154,7 @@
   function openAdd(meal, opts){
     opts=opts||{};
     addMeal=meal;
-    document.getElementById("addTitle").textContent="Add to "+meal;
+    document.getElementById("addTitle").textContent="Add to "+meal.charAt(0).toUpperCase()+meal.slice(1);
     document.getElementById("foodSearch").value="";
     setStatus("");
     showManualForm(false);
@@ -3286,7 +3286,7 @@
     document.getElementById("schDay").value = String(dayIdx);
     document.getElementById("schWeekStart").value = s ? (s.weekStart||planWeekKey()) : planWeekKey();
     var d=planWeekDate(dayIdx);
-    document.getElementById("schHeading").textContent = (s ? "Edit session" : "Add session")+" · "+DAYS_FULL[dayIdx]+" "+d.getDate()+" "+MON_SHORT[d.getMonth()];
+    document.getElementById("schHeading").textContent = (s ? "Edit Session" : "Add Session")+" · "+DAYS_FULL[dayIdx]+" "+d.getDate()+" "+MON_SHORT[d.getMonth()];
     document.getElementById("schType").value = s ? s.type : "gym";
     document.getElementById("schTitleInput").value = s ? (s.title||"") : "";
     setSchTime(s ? (s.time||defaultTimeForType(s.type)) : defaultTimeForType(document.getElementById("schType").value));
@@ -3655,7 +3655,7 @@
     var p=id?planById(id):null;
     planDraft = p ? {id:p.id,name:p.name,exercises:(p.exercises||[]).map(function(e){return {name:e.name,sets:e.sets,reps:e.reps};})}
                   : {id:uid(),name:"",exercises:[]};
-    document.getElementById("planEditHeading").textContent = p ? "Edit plan" : "New plan";
+    document.getElementById("planEditHeading").textContent = p ? "Edit Plan" : "New Plan";
     document.getElementById("planNameInput").value = planDraft.name||"";
     document.getElementById("planExInput").value="";
     document.getElementById("planDelete").style.display = p ? "block" : "none";
@@ -4840,7 +4840,7 @@
   function openItemEditor(phaseId,id){
     editingItem = id ? {phaseId:phaseId, id:id} : null;
     var it = id ? findItem(phaseId,id) : null;
-    document.getElementById('stackItemHeading').textContent = it ? "Edit supplement" : "Add supplement";
+    document.getElementById('stackItemHeading').textContent = it ? "Edit Supplement" : "Add Supplement";
     document.getElementById('siName').value = it ? (it.name||"") : "";
     document.getElementById('siDose').value = it ? (it.dose||"") : "";
     populatePhaseSelect(document.getElementById('siPhase'));
