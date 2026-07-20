@@ -2193,7 +2193,7 @@
     ["nfName","nfServing","nfCal","nfP","nfC","nfF"].forEach(function(i){ document.getElementById(i).value=""; });
     if(saveCb) saveCb.checked=false;
     configureAmount(0);
-    if(document.getElementById("addSheet").classList.contains("open")){ addToMeal(food, qty); renderFoodList(); }
+    if(document.getElementById("addSheet").classList.contains("open")){ addToMeal(food, qty); closeSheets(); }
     else{ renderManage(); }
   });
 
