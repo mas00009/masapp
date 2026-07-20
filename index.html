@@ -2991,6 +2991,12 @@
     var ain=document.getElementById("coachAskIn"); if(ain) ain.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); askCoach(); } });
   }
   var coachBusy=false;
+  function coachErr(msg){
+    var out=document.getElementById("coachOut");
+    out.innerHTML="<div class='coach-loading' style='animation:none'>"+msg+"</div>"+
+      "<button class='ghost' id='coachRetry' style='margin-top:14px'>↻ Try again</button>";
+    var r=document.getElementById("coachRetry"); if(r) r.addEventListener("click", generateCoach);
+  }
   async function generateCoach(){
     if(coachBusy) return;
     var btn=document.getElementById("coachGen"), out=document.getElementById("coachOut");
@@ -3015,13 +3021,12 @@
     var msg="Here is my full data snapshot as JSON:\n"+JSON.stringify(data)+"\n\nGive me personalised advice based on everything I've logged. Focus on what I should do differently, not a summary of today.";
     try{
       var txt=await aiComplete([{role:"user",content:msg}],1800,sys);
-      if(txt==null){ out.innerHTML=""; if(!(coachMsgs&&coachMsgs.length>=2)&&introEl) introEl.style.display=""; return; }
+      if(txt==null){ coachErr("The AI didn't respond. Check your key and model in settings."); return; }
       coachMsgs=[{role:"user",content:msg},{role:"assistant",content:txt}];
       renderCoach(parseCoachJSON(txt));
       saveCoach();
     }catch(e){
-      out.innerHTML="<div class='coach-loading' style='animation:none'>Couldn't get advice. Check your API key and model in settings, then try again.<br><span style='color:var(--faint);font-size:11px'>"+esc(String(e&&e.message||e))+"</span></div>";
-      if(!(coachMsgs&&coachMsgs.length>=2)&&introEl) introEl.style.display="";
+      coachErr("Couldn't get advice. Check your API key and model in settings.<br><span style='color:var(--faint);font-size:11px'>"+esc(String(e&&e.message||e))+"</span>");
     }finally{
       coachBusy=false; btn.disabled=false; btn.textContent=oldLabel;
     }
