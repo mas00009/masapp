@@ -255,6 +255,17 @@
   .photo-tray-status:empty{display:none}
   .photo-tray-status.err{color:var(--danger)}
   .photo-tray-status.ok{color:var(--ok)}
+  #formOut .fr-headline{font-family:var(--ff-ui);font-size:15px;font-weight:700;color:var(--text);margin:14px 2px 12px;line-height:1.35}
+  #formOut .fr-sec{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:9px}
+  #formOut .fr-sec.fr-good{border-color:color-mix(in srgb,var(--ok) 32%,var(--border))}
+  #formOut .fr-sec.fr-fix{border-color:color-mix(in srgb,var(--protein) 32%,var(--border))}
+  #formOut .fr-t{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:6px}
+  #formOut .fr-sec.fr-good .fr-t{color:var(--ok)}
+  #formOut .fr-sec.fr-fix .fr-t{color:var(--protein)}
+  #formOut .fr-sec ul{margin:0;padding-left:18px}
+  #formOut .fr-sec li{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:3px}
+  #formOut .fr-safety{font-size:12px;color:var(--muted);line-height:1.5;margin:4px 2px 0}
+  #formOut .fr-disc{text-align:center;color:var(--faint);font-size:10px;margin:12px 0 2px;line-height:1.5}
   .sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 12px 14px;overscroll-behavior:contain}
   /* app-wide thin, themed scrollbar */
   *{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
@@ -722,6 +733,9 @@
   #tab-lift .exc-hist{background:none;border:none;color:var(--faint);cursor:pointer;padding:2px 4px;display:grid;place-items:center}
   #tab-lift .exc-hist svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   #tab-lift .exc-hist:active{color:var(--blue)}
+  #tab-lift .exc-form{background:none;border:none;color:var(--faint);cursor:pointer;padding:2px 4px;display:grid;place-items:center}
+  #tab-lift .exc-form svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  #tab-lift .exc-form:active{color:var(--blue)}
 
   /* home dashboard */
   #tab-home.active{
@@ -1556,6 +1570,30 @@
   </div>
 </div>
 
+<!-- Form review -->
+<div class="sheet" id="formSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <h2 id="formTitle">Form review</h2>
+    <button class="close" data-close>Done</button>
+  </div>
+  <div class="sheet-body">
+    <div class="mono-note" style="text-align:left;margin:0 2px 12px">Add a few photos of yourself doing <b id="formExName">this exercise</b> — a side angle at the top and bottom of the rep works best. AI reviews your form from the photos.</div>
+    <input type="file" id="formFile" accept="image/*" multiple style="display:none">
+    <div id="formTray" hidden style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px;margin:0 0 10px">
+      <div class="photo-tray-thumbs" id="formThumbs"></div>
+      <div class="photo-tray-actions">
+        <span class="photo-tray-hint" id="formHint"></span>
+        <button type="button" class="ghost" id="formClear" style="width:auto;flex:0 0 auto;margin:0;padding:8px 12px;font-size:13px">Clear</button>
+      </div>
+    </div>
+    <button type="button" class="ghost" id="formAdd">+ Add photos</button>
+    <button type="button" class="primary" id="formReview" style="margin-top:8px">Review my form</button>
+    <div class="photo-tray-status" id="formStatus" style="margin:10px 2px 0"></div>
+    <div id="formOut"></div>
+  </div>
+</div>
+
 <!-- Targets sheet removed: targets now live in Settings -->
 
 <!-- Edit food sheet -->
@@ -2127,7 +2165,7 @@
 
   /* ---------- sheet open/close ---------- */
   var backdrop=document.getElementById("backdrop");
-  var ALL_SHEETS=["addSheet","manageSheet","editSheet","statsSheet","measureSheet","scheduleSheet","exSheet","exHistSheet","plansSheet","planEditSheet","stackSheet","stackItemSheet"];
+  var ALL_SHEETS=["addSheet","manageSheet","editSheet","statsSheet","measureSheet","scheduleSheet","exSheet","exHistSheet","plansSheet","planEditSheet","stackSheet","stackItemSheet","formSheet"];
   function openSheet(id){
     ALL_SHEETS.forEach(function(s){ var el=document.getElementById(s); if(el) el.classList.remove("open"); });
     backdrop.classList.add("open");
@@ -3442,6 +3480,7 @@
         "<button type='button' class='exc-rest' data-rest-cycle aria-label='Rest timer length'>"+restDefault+"s</button>"+
         ((e.sets&&e.sets.length)?"<button class='set-del' data-del-set='"+e.id+"' aria-label='Remove last set'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M6 12h12'/></svg></button>":"")+
         "<button class='set-add' data-add-set='"+e.id+"' aria-label='Add set'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12 6v12M6 12h12'/></svg></button>"+
+        "<button class='exc-form' data-form='"+encodeURIComponent(e.name)+"' aria-label='Form review'><svg viewBox='0 0 24 24'><path d='M4 8.5A1.5 1.5 0 0 1 5.5 7h1.7l1-1.6A1.5 1.5 0 0 1 10.5 4.7h3a1.5 1.5 0 0 1 1.3.7l1 1.6h1.7A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5v-9Z'/><circle cx='12' cy='12.5' r='3.2'/></svg></button>"+
         "<button class='exc-hist' data-hist='"+encodeURIComponent(e.name)+"' aria-label='History'><svg viewBox='0 0 24 24'><path d='M5 19V10M12 19V5M19 19v-6'/></svg></button>"+
         "<button class='exc-x' data-remove-ex='"+e.id+"' aria-label='Remove exercise'>\u00d7</button></div>"+
       "<div class='sets'>"+setsHtml+"</div>"+
@@ -3540,6 +3579,8 @@
       var card=coll.closest(".exc"); if(card) card.classList.toggle("collapsed", !!collapsedExc[cid]); return; }
     var hist=e.target.closest("[data-hist]");
     if(hist){ openExHist(decodeURIComponent(hist.getAttribute("data-hist"))); return; }
+    var fb=e.target.closest("[data-form]");
+    if(fb){ openFormReview(decodeURIComponent(fb.getAttribute("data-form"))); return; }
     var rep=e.target.closest("[data-repeat]");
     if(rep){ repeatWorkout(rep.getAttribute("data-repeat")); return; }
     var spi=e.target.closest("[data-start-plan-inline]");
@@ -3656,6 +3697,63 @@
     var name = b.hasAttribute("data-exc") ? document.getElementById("exSearch").value.trim() : b.getAttribute("data-exname");
     if(name){ addExercise(name); closeSheets(); }
   });
+
+  /* ---------- form review (photos -> AI form feedback) ---------- */
+  var formEx="", formQueue=[];
+  function fstat(msg,cls){ var el=document.getElementById("formStatus"); if(el){ el.textContent=msg||""; el.className="photo-tray-status"+(cls?(" "+cls):""); } }
+  function renderFormTray(){
+    var tray=document.getElementById("formTray"); if(!tray) return;
+    var thumbs=document.getElementById("formThumbs"), hint=document.getElementById("formHint");
+    if(!formQueue.length){ tray.hidden=true; thumbs.innerHTML=""; return; }
+    tray.hidden=false;
+    thumbs.innerHTML=formQueue.map(function(p,i){ return "<div class='photo-thumb'><img src='data:"+p.media+";base64,"+p.b64+"' alt=''><button type='button' class='rm' data-frm='"+i+"' aria-label='Remove photo'>×</button></div>"; }).join("");
+    hint.textContent=formQueue.length+" photo"+(formQueue.length===1?"":"s");
+  }
+  async function addFormPhotos(files){
+    var list=Array.prototype.slice.call(files);
+    for(var i=0;i<list.length;i++){ var f=list[i]; if(!f||String(f.type).indexOf("image")!==0) continue; var r=await downscaleImage(f,1280,0.82); if(r&&r.b64) formQueue.push(r); }
+    renderFormTray();
+  }
+  function openFormReview(name){
+    formEx=name||"this exercise"; formQueue=[]; renderFormTray(); fstat("");
+    document.getElementById("formOut").innerHTML="";
+    document.getElementById("formExName").textContent=formEx;
+    if(window.__openSheet) window.__openSheet("formSheet"); else openSheet("formSheet");
+  }
+  function frList(arr){ return (arr&&arr.length)?("<ul>"+arr.map(function(x){return "<li>"+esc(String(x))+"</li>";}).join("")+"</ul>"):""; }
+  function renderFormReview(o){
+    var h="";
+    if(o.summary) h+="<div class='fr-headline'>"+esc(o.summary)+"</div>";
+    if(o.good&&o.good.length) h+="<div class='fr-sec fr-good'><div class='fr-t'>What's working</div>"+frList(o.good)+"</div>";
+    if(o.fix&&o.fix.length) h+="<div class='fr-sec fr-fix'><div class='fr-t'>Fix this</div>"+frList(o.fix)+"</div>";
+    if(o.cues&&o.cues.length) h+="<div class='fr-sec'><div class='fr-t'>Cues to try</div>"+frList(o.cues)+"</div>";
+    if(o.safety) h+="<div class='fr-safety'>"+esc(o.safety)+"</div>";
+    h+="<div class='fr-disc'>General guidance from photos, not medical advice. Stop if you feel pain.</div>";
+    document.getElementById("formOut").innerHTML=h;
+  }
+  async function reviewForm(){
+    if(!formQueue.length){ fstat("Add at least one photo first.","err"); return; }
+    if(!aiKey){ fstat("Add your OpenRouter API key in Settings → AI features.","err"); return; }
+    var btn=document.getElementById("formReview"), ol=btn.textContent; btn.disabled=true; btn.textContent="Reviewing…";
+    fstat("Reviewing your form…");
+    try{
+      var content=formQueue.map(function(p){ return {type:"image",source:{type:"base64",media_type:p.media,data:p.b64}}; });
+      content.push({type:"text",text:"These photos show a person performing the exercise \""+formEx+"\". You are an experienced strength and conditioning coach. Review their form from the photos and give practical, specific feedback. Reply with ONLY a JSON object, no markdown: {\"summary\":one short overall line,\"good\":[up to 3 short things done well],\"fix\":[up to 3 short specific corrections],\"cues\":[up to 3 short actionable cues to try],\"safety\":one short safety note}. Base it on what is visible; if the angle or timing is unclear, say so in summary. Never diagnose injuries."});
+      var out=await aiComplete([{role:"user",content:content}],1200);
+      if(out==null){ fstat("The AI didn't respond. Check your key and model in settings.","err"); return; }
+      renderFormReview(parseCoachJSON(out));
+      fstat("");
+    }catch(e){
+      var reason=(e&&e.message)?String(e.message):"";
+      var visiony=/image|vision|modality|multimodal|not support|no endpoints|400|415/i.test(reason);
+      fstat("Couldn't review the photos"+(reason?(": "+reason.slice(0,110)):".")+(visiony?"  Your model may not read images — switch to a vision model like Gemini in Settings → AI features.":""),"err");
+    }finally{ btn.disabled=false; btn.textContent=ol; }
+  }
+  document.getElementById("formAdd").addEventListener("click", function(){ document.getElementById("formFile").click(); });
+  document.getElementById("formFile").addEventListener("change", function(e){ var fs=e.target.files; if(fs&&fs.length) addFormPhotos(fs); e.target.value=""; });
+  document.getElementById("formThumbs").addEventListener("click", function(e){ var b=e.target.closest("[data-frm]"); if(!b) return; formQueue.splice(+b.getAttribute("data-frm"),1); renderFormTray(); });
+  document.getElementById("formClear").addEventListener("click", function(){ formQueue=[]; fstat(""); renderFormTray(); });
+  document.getElementById("formReview").addEventListener("click", reviewForm);
 
   /* ---------- workout plans (templates) ---------- */
   var PLANS_KEY="mt_plans", plans=[], editingPlanId=null, planDraft=null;
