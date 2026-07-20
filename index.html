@@ -3829,7 +3829,7 @@
     try{ var Ctx=window.AudioContext||window.webkitAudioContext; if(Ctx){ if(!_audioCtx) _audioCtx=new Ctx(); if(_audioCtx.state==="suspended") _audioCtx.resume(); } }catch(e){}
     restTotal=restDefault; restEnd=Date.now()+restDefault*1000;
     bar.classList.remove("done"); bar.classList.remove("ending"); bar.removeAttribute("hidden");
-    document.getElementById("restSub").textContent=exName+" · set "+setNo;
+    document.getElementById("restSub").textContent=exName+" · Set "+setNo;
     if(restTimer) clearInterval(restTimer);
     restTick(); restTimer=setInterval(restTick,250);
   }
