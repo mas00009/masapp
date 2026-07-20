@@ -1766,7 +1766,7 @@
   ];
   var foods=[], targets={cal:1800,p:200,c:140,f:60,waterL:0}, log={};
   var CAL_GRACE = 30;
-  var aiKey="", aiModel="deepseek/deepseek-v4-flash", aiCustomModels=[];
+  var aiKey="", aiModel="google/gemini-3.5-flash", aiCustomModels=[];
   var current=new Date();
   var addMeal="breakfast", editingId=null;
 
@@ -1954,7 +1954,7 @@
   function renderAiModelPick(){
     var sel=document.getElementById("aiModelPick"), wrap=document.getElementById("aiModelCustomWrap"), customInp=document.getElementById("aiModelCustom");
     if(!sel) return;
-    var current=aiModel||"deepseek/deepseek-v4-flash", presets=aiPresetIds();
+    var current=aiModel||"google/gemini-3.5-flash", presets=aiPresetIds();
     if(presets.indexOf(current)<0 && aiCustomModels.indexOf(current)<0) aiCustomModels.push(current);
     var html=AI_PRESETS.map(function(p){
       return "<option value=\""+esc(p.id)+"\">"+esc(p.name)+"</option>";
@@ -1978,7 +1978,7 @@
     if(!sel) return aiModel;
     if(sel.value==="__custom__"){
       var inp=document.getElementById("aiModelCustom");
-      return (inp&&inp.value?inp.value.trim():"")||"deepseek/deepseek-v4-flash";
+      return (inp&&inp.value?inp.value.trim():"")||"google/gemini-3.5-flash";
     }
     return sel.value;
   }
@@ -2436,8 +2436,8 @@
 
   /* OpenRouter (needs your key) */
   function resolveAiModel(model){
-    var m=(model||"deepseek/deepseek-v4-flash").trim();
-    if(!m) m="deepseek/deepseek-v4-flash";
+    var m=(model||"google/gemini-3.5-flash").trim();
+    if(!m) m="google/gemini-3.5-flash";
     if(m.indexOf("/")<0) m="anthropic/"+m;
     return m;
   }
