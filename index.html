@@ -3008,6 +3008,7 @@
       if(txt==null){ out.innerHTML=""; return; }
       coachMsgs=[{role:"user",content:msg},{role:"assistant",content:txt}];
       renderCoach(parseCoachJSON(txt));
+      saveCoach();
     }catch(e){
       out.innerHTML="<div class='coach-loading' style='animation:none'>Couldn't get advice. Check your API key and model in settings, then try again.<br><span style='color:var(--faint);font-size:11px'>"+esc(String(e&&e.message||e))+"</span></div>";
     }finally{
@@ -3956,6 +3957,16 @@
 
   /* ---------- coach: follow-up ---------- */
   var coachMsgs=[];
+  var COACH_KEY="mt_coach";
+  function saveCoach(){ try{ sSet(COACH_KEY, JSON.stringify(coachMsgs||[])); }catch(e){} }
+  function restoreCoach(){
+    if(!Array.isArray(coachMsgs) || coachMsgs.length<2) return;
+    var o=null; try{ o=parseCoachJSON(coachMsgs[1].content); }catch(e){}
+    if(!o) return;
+    renderCoach(o);   // rebuilds the advice + "Ask again" + follow-up box
+    var thread=document.getElementById("coachThread");
+    if(thread){ for(var i=2;i<coachMsgs.length;i++){ var m=coachMsgs[i]; thread.insertAdjacentHTML("beforeend","<div class='cbub "+(m.role==="user"?"me":"ai")+"'>"+esc(m.content)+"</div>"); } }
+  }
   async function askCoach(){
     var inp=document.getElementById("coachAskIn"); if(!inp) return;
     var q=inp.value.trim(); if(!q) return;
@@ -3973,6 +3984,7 @@
       if(ans==null) return;
       coachMsgs.push({role:"assistant",content:ans});
       thread.insertAdjacentHTML("beforeend","<div class='cbub ai'>"+esc(ans)+"</div>");
+      saveCoach();
     }catch(e){ think.textContent="Couldn't answer just now. Try again."; think.classList.remove("think"); }
   }
 
@@ -4626,6 +4638,7 @@
     var rRaw=await sGet(REST_KEY); if(rRaw){ var rv=parseInt(rRaw,10); if(isFinite(rv)&&rv>0) restDefault=rv; }
     var wtRaw=await sGet(WATER_KEY); if(wtRaw){ try{ water=JSON.parse(wtRaw)||{}; }catch(e){ water={}; } }
     var jRaw=await sGet(JOURNAL_KEY); if(jRaw){ try{ journal=JSON.parse(jRaw)||{}; }catch(e){ journal={}; } }
+    var coRaw=await sGet(COACH_KEY); if(coRaw){ try{ coachMsgs=JSON.parse(coRaw)||[]; }catch(e){ coachMsgs=[]; } }
     if(!latestFor("weight")){ var tk=keyOf(new Date()); if(!body[tk]) body[tk]={}; body[tk].weight=DEFAULT_WEIGHT; await sSet(BODY_KEY, JSON.stringify(body)); }
     await migrateSchema();
     document.getElementById("loading").style.display="none";
@@ -4635,6 +4648,7 @@
     renderAll();
     renderBody();
     renderCoachIntro();
+    restoreCoach();
     renderPlan();
     renderWorkout();
     renderHome();
