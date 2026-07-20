@@ -379,7 +379,7 @@
   .tabbtn.active::before{content:"";position:absolute;top:2px;left:50%;transform:translateX(-50%);width:26px;height:3px;border-radius:2px;background:var(--grad);box-shadow:var(--glow)}
   .tabbtn:active{background:var(--surface)}
 
-  /* supps: The Stack — compact one-screen grid */
+  /* supps: The Stack - compact one-screen grid */
   #tab-supps{--accent:var(--blue)}
   #tab-supps .stk-timeline{display:flex;flex-direction:column;gap:9px;flex:1;min-height:0;overflow:hidden}
   #tab-supps .stk-phase{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:11px 12px 12px;display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
@@ -1258,7 +1258,7 @@
           <div class="wk-hero-stats">
             <div class="wk-stat wk-stat-sm"><span class="v" id="wkSets">0/0</span><span class="l">sets done</span></div>
             <div class="wk-stat wk-stat-sm"><span class="v" id="wkExs">0</span><span class="l">exercises</span></div>
-            <div class="wk-stat wk-stat-top"><span class="v" id="wkTop">—</span><span class="l wk-top-ex" id="wkTopEx"></span></div>
+            <div class="wk-stat wk-stat-top"><span class="v" id="wkTop">-</span><span class="l wk-top-ex" id="wkTopEx"></span></div>
           </div>
           <button type="button" class="wk-add" id="wkAddExercise" aria-label="Add exercise">+ Add</button>
         </div>
@@ -1526,7 +1526,7 @@
     <div class="set-section">
       <button type="button" class="set-head" data-set-toggle aria-expanded="false"><span>Reset</span><span class="set-chev">›</span></button>
       <div class="set-body" hidden>
-        <div class="mono-note" style="text-align:left;margin:2px 2px 12px">Erases all your logged data on this device — foods, food log, targets, body, profile, schedule, workouts, plans, supplements and journal. Your AI key and sync connection are kept.</div>
+        <div class="mono-note" style="text-align:left;margin:2px 2px 12px">Erases all your logged data on this device: foods, food log, targets, body, profile, schedule, workouts, plans, supplements and journal. Your AI key and sync connection are kept.</div>
         <label for="resetCloud" style="display:flex;align-items:center;gap:8px;margin:0 2px 14px;font-size:13px;color:var(--muted)">
           <input type="checkbox" id="resetCloud" checked>
           <span>Also erase the cloud copy</span>
@@ -2516,7 +2516,7 @@
         c:num(o.carbs!=null?o.carbs:(o.carbohydrates!=null?o.carbohydrates:o.c)),
         f:num(o.fat!=null?o.fat:o.f)};
     }
-    // Fallback: the JSON was truncated/malformed — pull each field out of the text.
+    // Fallback: the JSON was truncated/malformed - pull each field out of the text.
     function g(keys){
       for(var i=0;i<keys.length;i++){
         var m=body.match(new RegExp('"'+keys[i]+'"\\s*:\\s*(?:"([^"]*)"|(-?[0-9.]+))','i'));
@@ -2596,11 +2596,11 @@
       if(out==null){ pstat("AI didn't respond. Check your key in Settings → AI features.","err"); return; }
       fillNewFood(parseMacroJSON(out));
       photoQueue=[]; pstat(""); renderPhotoTray();
-      setStatus("Read — check the numbers, then add.","ok");
+      setStatus("Read. Check the numbers, then add.","ok");
     }catch(e){
       var reason=(e&&e.message)?String(e.message):"";
       var visiony=/image|vision|modality|multimodal|not support|no endpoints|content|400|415/i.test(reason);
-      pstat("Couldn't read the photos"+(reason?(" — "+reason.slice(0,120)):".")+(visiony?"  Your model may not read images — switch to a vision model like Claude in Settings → AI features.":""),"err");
+      pstat("Couldn't read the photos"+(reason?(": "+reason.slice(0,120)):".")+(visiony?"  Your model may not read images. Switch to a vision model like Claude in Settings → AI features.":""),"err");
     }
     finally{ if(go){ go.disabled=false; go.textContent="Read & log"; } }
   }
@@ -2988,7 +2988,7 @@
     var data=collectData();
     var sys="You are a supportive, practical personal health and fitness coach built into the user's own tracking app. "+
       "You receive a JSON snapshot of everything they have logged: profile and maintenance estimates, macro targets, nutrition history (7 and 30 days with daily totals, top foods and meal patterns), weight history, body measurements over time, body composition, supplement adherence (7 and 30 days), training (7 and 30 days of sessions with volume, sets, exercises, PRs), their weekly schedule (gym, basketball, swimming), hydration over 30 days, journal notes, and any userContext they typed before asking. "+
-      "Your job is to give ADVICE, not a recap. Do not simply restate what the numbers say — interpret patterns, identify what is working and what is not, and tell them what to change. Compare 7-day vs 30-day windows, spot trends in weight and measurements, comment on food variety and protein consistency, judge whether training volume supports their goal, relate schedule to recovery, and factor in notes about sleep or soreness. "+
+      "Your job is to give ADVICE, not a recap. Do not simply restate what the numbers say. Interpret patterns, identify what is working and what is not, and tell them what to change. Compare 7-day vs 30-day windows, spot trends in weight and measurements, comment on food variety and protein consistency, judge whether training volume supports their goal, relate schedule to recovery, and factor in notes about sleep or soreness. "+
       "If measuredMaintenanceKcal is present, prefer it over the formula estimate. Use body composition when available. Be specific with numbers but always translate them into actionable guidance. "+
       "Never promote extreme restriction or unsafe practices. For medical concerns, suggest a qualified professional; do not diagnose. "+
       "Keep each section to 2-4 short sentences. Speak directly to the user. "+
@@ -4031,7 +4031,7 @@
       if(r.goal!=null) bits.push("goal "+r1(r.goal)+" kg");
       if(r.eta!=null) bits.push("~"+Math.max(1,Math.round(r.eta))+" wk"+(Math.round(r.eta)===1?"":"s"));
     } else {
-      bits.push(r.goal==null?"set a goal weight in Profile to cut or bulk":"at goal — maintain");
+      bits.push(r.goal==null?"set a goal weight in Profile to cut or bulk":"at goal, maintain");
     }
     if(r.floored) bits.push("floored to safe minimum");
     document.getElementById("recSub").textContent=bits.join(" · ");
@@ -4419,7 +4419,7 @@
         if(note) note.textContent="Erasing cloud copy…";
         var res=await window.__wipeCloud();
         if(!res || !res.ok){
-          // don't wipe local if the cloud wipe failed — avoids auto-sync repopulating it
+          // don't wipe local if the cloud wipe failed - avoids auto-sync repopulating it
           if(note){ note.style.color="var(--danger)"; note.textContent="Cloud wipe failed"+(res&&res.status?(" ("+res.status+")"):"")+". Nothing was erased. Check your sync settings."; }
           goBtn.disabled=false; goBtn.textContent="Permanently erase everything";
           return;
@@ -4942,7 +4942,7 @@
   var DEFAULT_URL="https://masapp-sync.mmohammad.workers.dev";
   // Secrets / device-local flags stay off the cloud. Everything else under mt_ / stack- syncs.
   var EXCLUDE={ "mt_aikey":1, "mt_syncurl":1, "mt_synctoken":1, "mt_syncauto":1, "mt_sync_meta":1, "mt_lastexport":1, "mt_freshreset_2":1 };
-  // Known app keys — always considered so a missing local key can still be filled from cloud.
+  // Known app keys - always considered so a missing local key can still be filled from cloud.
   var KNOWN=["mt_foods","mt_foodsver","mt_targets","mt_log","mt_logreset","mt_body","mt_profile","mt_schedule","mt_workouts","mt_plans","mt_rest","mt_water","mt_supps_stack","mt_journal","mt_aimodel","mt_ai_custom_models","mt_schema_version"];
   var lastHash=null, timer=null;
   function ls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
@@ -4998,7 +4998,7 @@
   function parseRemote(obj){
     if(!obj||typeof obj!=="object") return null;
     if(obj.v===2 && obj.data) return { data:obj.data, updated:obj.updated||{} };
-    // legacy flat blob — treat whole object as data, or unwrap .data if present
+    // legacy flat blob - treat whole object as data, or unwrap .data if present
     if(obj.data && typeof obj.data==="object") return { data:obj.data, updated:obj.updated||{} };
     return { data:obj, updated:{} };
   }
@@ -5096,7 +5096,7 @@
 
   window.__syncConfigured=function(){ return !!cfg(); };
   // Overwrite the cloud copy with an empty snapshot. Correctness depends on the
-  // Worker replacing its stored value on POST /data (vs merging) — confirm in the
+  // Worker replacing its stored value on POST /data (vs merging) - confirm in the
   // Worker source. Returns {ok, status?, reason?}.
   window.__wipeCloud=async function(){
     var c=cfg(); if(!c) return {ok:false, reason:"not-configured"};
