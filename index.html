@@ -2492,16 +2492,35 @@
     return msg && msg.content!=null ? String(msg.content) : "";
   }
   function parseMacroJSON(txt){
-    var m=String(txt).replace(/```json/g,"").replace(/```/g,"").trim();
-    var s=m.indexOf("{"), e=m.lastIndexOf("}");
-    if(s>=0&&e>s) m=m.slice(s,e+1);
-    var o=JSON.parse(m);
-    return {name:o.name, serving:o.serving,
-      servingG:num(o.servingG!=null?o.servingG:(o.serving_g!=null?o.serving_g:o.servingGrams)),
-      cal:num(o.cal!=null?o.cal:o.calories),
-      p:num(o.protein!=null?o.protein:o.p),
-      c:num(o.carbs!=null?o.carbs:(o.carbohydrates!=null?o.carbohydrates:o.c)),
-      f:num(o.fat!=null?o.fat:o.f)};
+    var raw=String(txt).replace(/```json/gi,"").replace(/```/g,"").trim();
+    var body=raw; var s=raw.indexOf("{"); if(s>=0) body=raw.slice(s);
+    var o=null;
+    try{ var e=body.lastIndexOf("}"); o=JSON.parse(e>s ? body.slice(0,e+1) : body); }catch(_){ o=null; }
+    if(o && typeof o==="object"){
+      return {name:o.name, serving:o.serving,
+        servingG:num(o.servingG!=null?o.servingG:(o.serving_g!=null?o.serving_g:o.servingGrams)),
+        cal:num(o.cal!=null?o.cal:o.calories),
+        p:num(o.protein!=null?o.protein:o.p),
+        c:num(o.carbs!=null?o.carbs:(o.carbohydrates!=null?o.carbohydrates:o.c)),
+        f:num(o.fat!=null?o.fat:o.f)};
+    }
+    // Fallback: the JSON was truncated/malformed — pull each field out of the text.
+    function g(keys){
+      for(var i=0;i<keys.length;i++){
+        var m=body.match(new RegExp('"'+keys[i]+'"\\s*:\\s*(?:"([^"]*)"|(-?[0-9.]+))','i'));
+        if(m) return m[1]!=null?m[1]:m[2];
+      }
+      return null;
+    }
+    return {
+      name: g(["name"]),
+      serving: g(["serving"]),
+      servingG: num(g(["servingG","serving_g","servingGrams"])),
+      cal: num(g(["cal","calories"])),
+      p: num(g(["protein","p"])),
+      c: num(g(["carbs","carbohydrates","c"])),
+      f: num(g(["fat","f"]))
+    };
   }
 
   /* ---------- multi-photo -> food (e.g. product shot + nutrition panel) ---------- */
@@ -2561,7 +2580,7 @@
     try{
       var content=photoQueue.map(function(p){ return {type:"image",source:{type:"base64",media_type:p.media,data:p.b64}}; });
       content.push({type:"text",text:"These image(s) are of a SINGLE food or product. There may be more than one photo of the same item - for example the product or its name in one photo and the nutrition information panel in another. Use ALL of the images together to identify the product and read the nutrition for ONE serving exactly as printed. Prefer the per-serving values from the nutrition panel. Reply with ONLY a JSON object, no prose and no markdown: {\"name\":the product name,\"serving\":the serving size text shown (e.g. \"1 scoop (30g)\" or \"per 100g\"),\"servingG\":the weight of ONE serving in grams as a number (e.g. 30, or 100 for per-100g values; 0 if not shown),\"cal\":number kcal,\"protein\":number grams,\"carbs\":number grams,\"fat\":number grams}. If a value is not shown, use 0."});
-      var out=await aiComplete([{role:"user",content:content}],600);
+      var out=await aiComplete([{role:"user",content:content}],2000);
       if(out==null){ pstat("AI didn't respond. Check your key in Settings → AI features.","err"); return; }
       fillNewFood(parseMacroJSON(out));
       photoQueue=[]; pstat(""); renderPhotoTray();
