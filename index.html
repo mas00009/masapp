@@ -894,6 +894,7 @@
   #tab-coach .coach-ask input{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:11px;padding:12px;font-family:var(--ff-ui);font-size:14px;outline:none}
   #tab-coach .coach-ask button{flex:none;background:var(--protein);color:#2a0710;border:none;border-radius:11px;padding:0 16px;font-family:var(--ff-ui);font-weight:700;font-size:13px;cursor:pointer}
   #tab-coach .coach-cont-h{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:16px 2px 0;padding-top:14px;border-top:1px solid var(--border)}
+  #tab-coach .coach-regen{margin-top:16px}
   #tab-coach .coach-thread{display:flex;flex-direction:column;gap:8px;margin-top:10px}
   #tab-coach .coach-thread:empty{margin-top:0}
   #tab-coach .cbub{max-width:88%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.5}
@@ -2976,10 +2977,10 @@
       h+="<button class='coach-apply' id='coachApply'>Apply suggested targets · "+r0(num(st.calories))+" kcal"+(num(st.protein)>0?(" · "+r0(num(st.protein))+"P"):"")+"</button>";
     }
     h+="<div class='coach-disclaimer'>General guidance from your own data. Not medical advice.</div>";
-    h+="<button class='ghost coach-regen' id='coachRegen'>↻ Ask again for fresh advice</button>";
     h+="<div class='coach-cont-h'>Continue this conversation</div>";
     h+="<div class='coach-thread' id='coachThread'></div>";
     h+="<div class='coach-ask'><input id='coachAskIn' type='text' placeholder='Ask a follow-up…' autocomplete='off'><button id='coachAskBtn'>Ask</button></div>";
+    h+="<button class='ghost coach-regen' id='coachRegen'>↻ Ask again for fresh advice</button>";
     document.getElementById("coachOut").innerHTML=h;
     var intro=document.querySelector("#tab-coach .coach-intro"); if(intro) intro.style.display="none";
     var ap=document.getElementById("coachApply"); if(ap) ap.addEventListener("click", applyCoachTargets);
