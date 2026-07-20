@@ -640,6 +640,8 @@
   #tab-lift .wk-plan-quick .pq:active{background:var(--surface-2)}
   #tab-lift .wk-plan-quick .pq b{color:var(--protein);font-weight:800}
   #tab-lift .wk-plan-quick .pq .c{font-family:var(--ff-num);font-size:10px;color:var(--muted);font-weight:600}
+  #tab-lift .wk-saveplan{width:100%;margin-top:8px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:12px;font-family:var(--ff-ui);font-weight:600;font-size:13px;letter-spacing:.02em;cursor:pointer}
+  #tab-lift .wk-saveplan:active{background:var(--surface-2)}
   #plansList{display:flex;flex-direction:column;gap:8px;margin-top:4px}
   #plansList .plan-item{background:var(--surface-2);border:1px solid var(--border);border-radius:13px;padding:12px 13px;display:flex;align-items:center;gap:11px}
   #plansList .plan-item .pi-main{flex:1;min-width:0;cursor:pointer}
@@ -3431,7 +3433,7 @@
     document.getElementById("wkSets").textContent=stt.done+"/"+stt.tot;
     document.getElementById("wkExs").textContent=stt.ex;
     setWkTop(stt);
-    list.innerHTML = s.exercises.length ? s.exercises.map(excCard).join("") : (function(){
+    list.innerHTML = s.exercises.length ? (s.exercises.map(excCard).join("")+"<button type='button' class='wk-saveplan' data-save-plan>Save as plan</button>") : (function(){
       var lw=lastWorkoutBefore(wKey());
       var rep = lw ? "<button class='wk-repeat' data-repeat='"+lw+"'>\u21bb Repeat "+esc(fmtShort(lw))+"'s session</button>" : "";
       return rep + "<div class='wk-empty'>No exercises yet.<br>Add exercises, or load a saved plan.</div>";
@@ -3488,6 +3490,7 @@
     if(rep){ repeatWorkout(rep.getAttribute("data-repeat")); return; }
     var spi=e.target.closest("[data-start-plan-inline]");
     if(spi){ var pp=planById(spi.getAttribute("data-start-plan-inline")); if(pp) applyPlan(pp); return; }
+    if(e.target.closest("[data-save-plan]")){ saveSessionAsPlan(); return; }
     if(e.target.closest("[data-rest-cycle]")){ cycleRestDefault(); return; }
     var addS=e.target.closest("[data-add-set]");
     if(addS){ var ex=exById(addS.getAttribute("data-add-set")); if(ex){ var last=ex.sets[ex.sets.length-1]; ex.sets.push({w:last?last.w:"",reps:last?last.reps:"",done:false}); saveWorkouts(); renderWorkout(); } return; }
@@ -3644,12 +3647,12 @@
         "<button class='pe-x' data-pe-x='"+i+"' aria-label='Remove'>\u00d7</button></div>";
     }).join("") : "<div class='pe-empty'>Add exercises below.</div>";
   }
-  function openPlanEditor(id){
+  function openPlanEditor(id, preset){
     editingPlanId=id||null;
     var p=id?planById(id):null;
     planDraft = p ? {id:p.id,name:p.name,exercises:(p.exercises||[]).map(function(e){return {name:e.name,sets:e.sets,reps:e.reps};})}
-                  : {id:uid(),name:"",exercises:[]};
-    document.getElementById("planEditHeading").textContent = p ? "Edit Plan" : "New Plan";
+                  : {id:uid(),name:(preset&&preset.name)||"",exercises:(preset&&preset.exercises)?preset.exercises.map(function(e){return {name:e.name,sets:e.sets,reps:e.reps};}):[]};
+    document.getElementById("planEditHeading").textContent = p ? "Edit Plan" : (preset ? "Save as Plan" : "New Plan");
     document.getElementById("planNameInput").value = planDraft.name||"";
     document.getElementById("planExInput").value="";
     document.getElementById("planDelete").style.display = p ? "block" : "none";
@@ -3676,6 +3679,20 @@
     var p=planById(id); if(!p) return;
     applyPlan(p); closeSheets();
     var t=document.querySelector('.tabbtn[data-tab="lift"]'); if(t) t.click();
+  }
+  // Turn the current day's logged session into plan exercises (name, set count,
+  // and the most common reps across the logged sets).
+  function sessionToPlanExercises(){
+    return (wSession().exercises||[]).map(function(e){
+      var sets=e.sets||[], n=sets.length||1, counts={}, best="", bestN=0;
+      sets.forEach(function(st){ var r=String(st.reps==null?"":st.reps).trim(); if(!r) return; counts[r]=(counts[r]||0)+1; if(counts[r]>bestN){ bestN=counts[r]; best=r; } });
+      return {name:e.name, sets:n, reps: best!=="" ? (parseInt(best,10)||10) : 10};
+    });
+  }
+  function saveSessionAsPlan(){
+    var exs=sessionToPlanExercises();
+    if(!exs.length) return;
+    openPlanEditor(null, {name:"", exercises:exs});   // pre-filled editor: name it, tweak, save
   }
   document.getElementById("wkPlansBtn").addEventListener("click", openPlans);
   document.getElementById("plansNew").addEventListener("click", function(){ openPlanEditor(null); });
