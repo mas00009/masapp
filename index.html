@@ -2305,7 +2305,7 @@
     if(w>0){ var today=keyOf(new Date()); if(!body[today]) body[today]={}; body[today].weight=r1(w); saveBody(); }
     renderBody();
     renderRecommendation();
-    var b=document.getElementById("saveProfile"); b.textContent="Saved ✓"; setTimeout(function(){b.textContent="Save profile";},1200);
+    var b=document.getElementById("saveProfile"); b.textContent="Saved ✓"; b.classList.add("saved"); setTimeout(function(){b.textContent="Save profile"; b.classList.remove("saved");},1500);
   });
 
   document.getElementById("saveTargets").addEventListener("click",function(){
@@ -2317,7 +2317,7 @@
       waterL:(isFinite(wv)&&wv>0)?wv:0};
     saveTargetsStore(); renderSummary();
     if(typeof renderToday==="function") renderToday();
-    var b=document.getElementById("saveTargets"); b.textContent="Saved ✓"; setTimeout(function(){b.textContent="Save targets";},1200);
+    var b=document.getElementById("saveTargets"); b.textContent="Saved ✓"; b.classList.add("saved"); setTimeout(function(){b.textContent="Save targets"; b.classList.remove("saved");},1500);
   });
   document.getElementById("addFoodFromManage").addEventListener("click",function(){
     openAdd(addMeal, {saveToList:true});
