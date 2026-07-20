@@ -4326,8 +4326,14 @@
     }
     return false;
   }
-  // Body badge: show if there's no body data at all, or the latest entry is 14+ days old.
+  // Body badge: weekly Sunday weigh-in reminder (until weighed that day),
+  // plus a fallback if there's no data at all or the latest entry is 14+ days old.
   function bodyNeedsUpdate(){
+    // Sunday weigh-in reminder: show until a weight is logged today
+    if(new Date().getDay()===0){
+      var lw=latestFor("weight");
+      if(!(lw && lw.date===keyOf(new Date()))) return true;
+    }
     var ds=bodyDatesDesc(), latest=null;
     for(var i=0;i<ds.length;i++){
       var e=body[ds[i]]; if(!e) continue;
