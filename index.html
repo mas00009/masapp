@@ -375,33 +375,32 @@
   .tabbtn.active::before{content:"";position:absolute;top:2px;left:50%;transform:translateX(-50%);width:26px;height:3px;border-radius:2px;background:var(--grad);box-shadow:var(--glow)}
   .tabbtn:active{background:var(--surface)}
 
-  /* supps: The Stack */
+  /* supps: The Stack — compact one-screen grid */
   #tab-supps{--accent:var(--blue)}
-  #tab-supps .stk-timeline{position:relative;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:8px}
-  #tab-supps .stk-phase{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:7px;overflow:hidden}
-  #tab-supps .stk-phase:last-child{margin-bottom:0}
-  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--border)}
-  #tab-supps .stk-phase-name{font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;flex:1;min-width:0;color:var(--text)}
-  #tab-supps .stk-time{font-family:var(--ff-num);font-size:11px;font-weight:500;color:var(--muted);flex:none;white-space:nowrap}
-  #tab-supps .stk-now-tag{font-family:var(--ff-num);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);background:color-mix(in srgb,var(--blue) 14%,transparent);padding:3px 7px;border-radius:6px;line-height:1;flex:none}
-  #tab-supps .stk-items{display:flex;flex-direction:column;padding:0 7px}
-  #tab-supps .stk-item{display:flex;align-items:center;gap:10px;background:transparent;border:none;border-top:1px solid var(--border);border-radius:0;padding:4px 6px;transition:opacity .25s}
-  #tab-supps .stk-item:first-child{border-top:none}
-  #tab-supps .stk-item:active{opacity:.7}
-  #tab-supps .stk-check{flex:0 0 auto;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--border);background:transparent;cursor:pointer;position:relative;transition:border-color .2s,background .2s;padding:0}
-  #tab-supps .stk-check svg{position:absolute;inset:0;margin:auto;width:11px;height:11px;stroke:var(--bg);stroke-width:3.4;fill:none;opacity:0;transition:opacity .15s}
-  #tab-supps .stk-check:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-  #tab-supps .stk-name{font-family:var(--ff-ui);font-size:13px;font-weight:500;letter-spacing:0;color:var(--text);flex:0 0 auto}
-  #tab-supps .stk-with{font-family:var(--ff-num);font-size:11px;color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  #tab-supps .stk-dose{font-family:var(--ff-num);font-size:11px;font-weight:600;color:var(--blue);background:color-mix(in srgb,var(--blue) 13%,transparent);padding:2px 7px;border-radius:6px;white-space:nowrap;flex:0 0 auto;font-variant-numeric:tabular-nums}
-  #tab-supps .stk-item.done{opacity:.5}
-  #tab-supps .stk-item.done .stk-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
-  #tab-supps .stk-check.on{background:var(--blue);border-color:var(--blue)}
-  #tab-supps .stk-check.on svg{opacity:1}
-  #tab-supps .stk-allbtn{display:block;width:calc(100% - 14px);margin:3px 7px 5px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:var(--ff-ui);font-weight:600;font-size:11px;letter-spacing:.02em;text-transform:none;padding:6px 10px;border-radius:8px;cursor:pointer}
+  #tab-supps .stk-timeline{display:flex;flex-direction:column;gap:9px;flex:1;min-height:0;overflow:hidden}
+  #tab-supps .stk-phase{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:11px 12px 12px;display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
+  #tab-supps .stk-phase.active{border-color:color-mix(in srgb,var(--blue) 50%,var(--border));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blue) 22%,transparent)}
+  #tab-supps .stk-phase-head{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex:none}
+  #tab-supps .stk-phase-name{order:1;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text);flex:none}
+  #tab-supps .stk-now-tag{order:2;font-family:var(--ff-num);font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--blue);padding:2px 6px;border-radius:20px;line-height:1.35;flex:none}
+  #tab-supps .stk-time{order:3;font-family:var(--ff-num);font-size:10.5px;font-weight:500;color:var(--faint);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #tab-supps .stk-allbtn{order:4;flex:none;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:4px 12px;font-family:var(--ff-ui);font-size:11px;font-weight:600;letter-spacing:.02em;cursor:pointer}
   #tab-supps .stk-allbtn:active{background:var(--surface-2)}
   #tab-supps .stk-allbtn.done{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,var(--border))}
-  #tab-supps .stk-empty{color:var(--faint);font-size:12.5px;text-align:center;padding:26px 10px;line-height:1.6}
+  #tab-supps .stk-items{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:stretch}
+  #tab-supps .stk-item{display:flex;align-items:center;gap:9px;text-align:left;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:0 11px;min-height:46px;cursor:pointer;overflow:hidden;transition:opacity .2s,border-color .2s,transform .05s}
+  #tab-supps .stk-item:active{transform:scale(.98)}
+  #tab-supps .stk-check{flex:0 0 auto;width:20px;height:20px;border-radius:7px;border:1.7px solid var(--faint);background:transparent;position:relative;display:block;transition:background .2s,border-color .2s}
+  #tab-supps .stk-check svg{position:absolute;inset:0;margin:auto;width:12px;height:12px;stroke:#fff;stroke-width:3.2;fill:none;opacity:0;transition:opacity .15s}
+  #tab-supps .stk-check.on{background:var(--blue);border-color:var(--blue)}
+  #tab-supps .stk-check.on svg{opacity:1}
+  #tab-supps .stk-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  #tab-supps .stk-name{font-family:var(--ff-ui);font-size:12.5px;font-weight:600;color:var(--text);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+  #tab-supps .stk-dose{font-family:var(--ff-num);font-size:10.5px;font-weight:600;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+  #tab-supps .stk-item.done{opacity:.5;border-color:color-mix(in srgb,var(--blue) 32%,var(--border))}
+  #tab-supps .stk-item.done .stk-name{text-decoration:line-through;text-decoration-color:var(--faint);color:var(--muted)}
+  #tab-supps .stk-item.done .stk-dose{color:var(--muted)}
+  #tab-supps .stk-empty{grid-column:1/-1;color:var(--faint);font-size:12.5px;text-align:center;padding:26px 10px;line-height:1.6;align-self:center}
   #tab-supps.active{
     display:flex;flex-direction:column;overflow:hidden;
     height:calc(100dvh - 80px - env(safe-area-inset-bottom));
@@ -4658,16 +4657,15 @@
       any=true;
       var items=due.map(function(it){
         var on=!!takenSet[it.id];
-        return "<div class='stk-item"+(on?" done":"")+"' data-item='"+it.id+"'>"+
-          "<button class='stk-check"+(on?" on":"")+"' data-item='"+it.id+"' aria-label='Mark taken' aria-pressed='"+(on?"true":"false")+"'><svg viewBox='0 0 24 24'><polyline points='5 13 10 18 19 7'/></svg></button>"+
-          "<span class='stk-name'>"+esc(it.name)+"</span>"+
-          "<span class='stk-with'>"+esc(subtitle(it))+"</span>"+
-          "<span class='stk-dose'>"+esc(it.dose||"")+"</span></div>";
+        return "<button class='stk-item"+(on?" done":"")+"' data-item='"+it.id+"' aria-pressed='"+(on?"true":"false")+"' aria-label='"+esc(it.name)+", mark taken'>"+
+          "<span class='stk-check"+(on?" on":"")+"' aria-hidden='true'><svg viewBox='0 0 24 24'><polyline points='5 13 10 18 19 7'/></svg></span>"+
+          "<span class='stk-body'><span class='stk-name'>"+esc(it.name)+"</span>"+
+          (it.dose?"<span class='stk-dose'>"+esc(it.dose)+"</span>":"")+"</span></button>";
       }).join("");
       html+="<section class='stk-phase' data-start='"+ph.start+"' data-phase='"+ph.id+"'>"+
-        "<div class='stk-phase-head'><span class='stk-phase-name'>"+esc(ph.name||"")+"</span><span class='stk-time'>"+esc(fmtPhaseTime(ph.time||""))+"</span></div>"+
-        "<div class='stk-items'>"+items+"</div>"+
-        "<button class='stk-allbtn' data-phase-all='"+ph.id+"'>Mark all taken</button></section>";
+        "<div class='stk-phase-head'><span class='stk-phase-name'>"+esc(ph.name||"")+"</span><span class='stk-time'>"+esc(fmtPhaseTime(ph.time||""))+"</span>"+
+        "<button class='stk-allbtn' data-phase-all='"+ph.id+"'>Take all</button></div>"+
+        "<div class='stk-items'>"+items+"</div></section>";
     });
     timeline.innerHTML = any ? html : "<div class='stk-empty'>"+(isViewToday()?"Nothing scheduled today.":"Nothing due this day.")+"<br>Tap the ✎ icon to build your stack.</div>";
     refresh(); syncAllBtns(); tick();
@@ -4700,9 +4698,11 @@
   function applyItem(id){
     var on=!!takenSet[id];
     var item=timeline.querySelector(".stk-item[data-item='"+id+"']");
-    var chk=timeline.querySelector(".stk-check[data-item='"+id+"']");
-    if(item) item.classList.toggle('done', on);
-    if(chk){ chk.classList.toggle('on', on); chk.setAttribute('aria-pressed', on?'true':'false'); }
+    if(item){
+      item.classList.toggle('done', on);
+      item.setAttribute('aria-pressed', on?'true':'false');
+      var chk=item.querySelector('.stk-check'); if(chk) chk.classList.toggle('on', on);
+    }
   }
   function phaseItemIds(phaseId){
     var ph=stack.phases.filter(function(p){return p.id===phaseId;})[0]; if(!ph) return [];
@@ -4711,17 +4711,17 @@
   function updateAllBtn(btn){
     var ids=phaseItemIds(btn.getAttribute('data-phase-all'));
     var allOn=ids.length>0 && ids.every(function(id){ return !!takenSet[id]; });
-    btn.textContent=allOn?'Clear':'Mark all taken';
+    btn.textContent=allOn?'Clear':'Take all';
     btn.classList.toggle('done', allOn);
   }
   function syncAllBtns(){ Array.prototype.slice.call(timeline.querySelectorAll('.stk-allbtn')).forEach(updateAllBtn); }
 
   timeline.addEventListener('click', function(e){
-    var chk=e.target.closest('.stk-check');
-    if(chk){ var id=chk.getAttribute('data-item'); takenSet[id]=!takenSet[id]; applyItem(id); persistTaken(); refresh(); syncAllBtns(); return; }
     var all=e.target.closest('.stk-allbtn');
     if(all){ var ids=phaseItemIds(all.getAttribute('data-phase-all')); var allOn=ids.length>0 && ids.every(function(x){return !!takenSet[x];});
       ids.forEach(function(x){ takenSet[x]=!allOn; applyItem(x); }); persistTaken(); refresh(); syncAllBtns(); return; }
+    var it=e.target.closest('.stk-item');
+    if(it){ var id=it.getAttribute('data-item'); takenSet[id]=!takenSet[id]; applyItem(id); persistTaken(); refresh(); syncAllBtns(); return; }
   });
 
   function tick(){
