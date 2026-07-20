@@ -251,6 +251,10 @@
   .photo-tray-hint{flex:1;font-family:var(--ff-num);font-size:11px;color:var(--muted)}
   .photo-tray .photo-clear{width:auto;flex:0 0 auto;margin:0;padding:8px 12px;font-size:13px}
   .photo-tray .photo-go{width:auto;flex:0 0 auto;margin:0;padding:8px 14px;font-size:13px}
+  .photo-tray-status{font-family:var(--ff-num);font-size:11.5px;line-height:1.4;color:var(--muted);margin-top:9px}
+  .photo-tray-status:empty{display:none}
+  .photo-tray-status.err{color:var(--danger)}
+  .photo-tray-status.ok{color:var(--ok)}
   .sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 12px 14px;overscroll-behavior:contain}
   /* app-wide thin, themed scrollbar */
   *{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
@@ -1371,6 +1375,7 @@
       <button type="button" class="ghost photo-clear" id="photoClear">Clear</button>
       <button type="button" class="primary photo-go" id="photoAnalyze">Read &amp; log</button>
     </div>
+    <div class="photo-tray-status" id="photoStatus"></div>
   </div>
   <div class="sheet-body">
     <div id="foodList"></div>
@@ -2499,8 +2504,30 @@
 
   /* ---------- multi-photo -> food (e.g. product shot + nutrition panel) ---------- */
   var photoQueue=[];
-  function fileToB64(file){
-    return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(String(r.result).split(",")[1]);}; r.onerror=rej; r.readAsDataURL(file); });
+  function pstat(msg, cls){
+    var el=document.getElementById("photoStatus"); if(!el) return;
+    el.textContent=msg||""; el.className="photo-tray-status"+(cls?(" "+cls):"");
+  }
+  // Downscale + re-encode as JPEG so full-size phone photos don't blow up the
+  // request (raw camera shots are multi-MB -> huge base64 -> failed calls).
+  function downscaleImage(file, maxDim, quality){
+    return new Promise(function(resolve){
+      var url=URL.createObjectURL(file), img=new Image();
+      img.onload=function(){
+        try{
+          var w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+          var scale=Math.min(1, maxDim/Math.max(w,h||1));
+          var cw=Math.max(1,Math.round(w*scale)), ch=Math.max(1,Math.round(h*scale));
+          var c=document.createElement("canvas"); c.width=cw; c.height=ch;
+          c.getContext("2d").drawImage(img,0,0,cw,ch);
+          URL.revokeObjectURL(url);
+          var d=c.toDataURL("image/jpeg", quality);
+          resolve({ b64:d.split(",")[1], media:"image/jpeg" });
+        }catch(e){ URL.revokeObjectURL(url); resolve(null); }
+      };
+      img.onerror=function(){ URL.revokeObjectURL(url); resolve(null); };
+      img.src=url;
+    });
   }
   function renderPhotoTray(){
     var tray=document.getElementById("photoTray"); if(!tray) return;
@@ -2513,35 +2540,41 @@
     hint.textContent=photoQueue.length+" photo"+(photoQueue.length===1?"":"s")+" ready";
   }
   async function addPhotosToQueue(files){
+    pstat("");
     // snapshot now: the input's live FileList is cleared right after this call
     var list=Array.prototype.slice.call(files);
     for(var i=0;i<list.length;i++){
       var f=list[i]; if(!f || String(f.type).indexOf("image")!==0) continue;
-      try{ var b64=await fileToB64(f); photoQueue.push({b64:b64, media:f.type||"image/jpeg"}); }catch(e){}
+      var r=await downscaleImage(f, 1280, 0.82);
+      if(r && r.b64) photoQueue.push(r);
     }
     renderPhotoTray();
   }
   async function analyzePhotoQueue(){
-    if(!photoQueue.length){ setStatus("Take or add a photo first.","err"); return; }
-    if(!aiKey){ setStatus("Add your OpenRouter API key in settings (⚙) to use AI.","err"); return; }
+    if(!photoQueue.length){ pstat("Take or add a photo first.","err"); return; }
+    if(!aiKey){ pstat("Add your OpenRouter API key in Settings → AI features.","err"); return; }
     var n=photoQueue.length, go=document.getElementById("photoAnalyze");
     if(go){ go.disabled=true; go.textContent="Reading…"; }
-    setStatus("Reading "+n+" photo"+(n===1?"":"s")+"…");
+    pstat("Reading "+n+" photo"+(n===1?"":"s")+"…");
     try{
       var content=photoQueue.map(function(p){ return {type:"image",source:{type:"base64",media_type:p.media,data:p.b64}}; });
       content.push({type:"text",text:"These image(s) are of a SINGLE food or product. There may be more than one photo of the same item - for example the product or its name in one photo and the nutrition information panel in another. Use ALL of the images together to identify the product and read the nutrition for ONE serving exactly as printed. Prefer the per-serving values from the nutrition panel. Reply with ONLY a JSON object, no prose and no markdown: {\"name\":the product name,\"serving\":the serving size text shown (e.g. \"1 scoop (30g)\" or \"per 100g\"),\"servingG\":the weight of ONE serving in grams as a number (e.g. 30, or 100 for per-100g values; 0 if not shown),\"cal\":number kcal,\"protein\":number grams,\"carbs\":number grams,\"fat\":number grams}. If a value is not shown, use 0."});
       var out=await aiComplete([{role:"user",content:content}],600);
-      if(out==null) return;
+      if(out==null){ pstat("AI didn't respond. Check your key in Settings → AI features.","err"); return; }
       fillNewFood(parseMacroJSON(out));
-      photoQueue=[]; renderPhotoTray();
+      photoQueue=[]; pstat(""); renderPhotoTray();
       setStatus("Read from your photos. Check the numbers, then tap Add to meal.","ok");
-    }catch(e){ setStatus("Couldn't read those photos. Check your key and model in settings.","err"); }
+    }catch(e){
+      var reason=(e&&e.message)?String(e.message):"";
+      var visiony=/image|vision|modality|multimodal|not support|no endpoints|content|400|415/i.test(reason);
+      pstat("Couldn't read the photos"+(reason?(" — "+reason.slice(0,120)):".")+(visiony?"  Your model may not read images — switch to a vision model like Claude in Settings → AI features.":""),"err");
+    }
     finally{ if(go){ go.disabled=false; go.textContent="Read & log"; } }
   }
   document.getElementById("photoLog").addEventListener("click",function(){ document.getElementById("photoLogFile").click(); });
   document.getElementById("photoLogFile").addEventListener("change",function(e){ var fs=e.target.files; if(fs&&fs.length) addPhotosToQueue(fs); e.target.value=""; });
   document.getElementById("photoThumbs").addEventListener("click",function(e){ var b=e.target.closest("[data-rm]"); if(!b) return; photoQueue.splice(+b.getAttribute("data-rm"),1); renderPhotoTray(); });
-  document.getElementById("photoClear").addEventListener("click",function(){ photoQueue=[]; renderPhotoTray(); });
+  document.getElementById("photoClear").addEventListener("click",function(){ photoQueue=[]; pstat(""); renderPhotoTray(); });
   document.getElementById("photoAnalyze").addEventListener("click",analyzePhotoQueue);
 
   document.addEventListener("paste",function(e){
