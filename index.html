@@ -1578,7 +1578,7 @@
     <button class="close" data-close>Done</button>
   </div>
   <div class="sheet-body">
-    <div class="mono-note" style="text-align:left;margin:0 2px 12px">Add a few photos of yourself doing <b id="formExName">this exercise</b> — a side angle at the top and bottom of the rep works best. AI reviews your form from the photos.</div>
+    <div class="mono-note" style="text-align:left;margin:0 2px 12px">Add a few photos of yourself doing <b id="formExName">this exercise</b>. A side angle at the top and bottom of the rep works best. AI reviews your form from the photos.</div>
     <input type="file" id="formFile" accept="image/*" multiple style="display:none">
     <div id="formTray" hidden style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px;margin:0 0 10px">
       <div class="photo-tray-thumbs" id="formThumbs"></div>
@@ -3699,7 +3699,8 @@
   });
 
   /* ---------- form review (photos -> AI form feedback) ---------- */
-  var formEx="", formQueue=[];
+  var formEx="", formQueue=[], FORM_KEY="mt_form_reviews", formReviews={};
+  function saveFormReviews(){ try{ sSet(FORM_KEY, JSON.stringify(formReviews)); }catch(e){} }
   function fstat(msg,cls){ var el=document.getElementById("formStatus"); if(el){ el.textContent=msg||""; el.className="photo-tray-status"+(cls?(" "+cls):""); } }
   function renderFormTray(){
     var tray=document.getElementById("formTray"); if(!tray) return;
@@ -3716,9 +3717,10 @@
   }
   function openFormReview(name){
     formEx=name||"this exercise"; formQueue=[]; renderFormTray(); fstat("");
-    document.getElementById("formOut").innerHTML="";
     document.getElementById("formExName").textContent=formEx;
-    if(window.__openSheet) window.__openSheet("formSheet"); else openSheet("formSheet");
+    if(formReviews[formEx]) renderFormReview(formReviews[formEx]);
+    else document.getElementById("formOut").innerHTML="";
+    openSheet("formSheet");
   }
   function frList(arr){ return (arr&&arr.length)?("<ul>"+arr.map(function(x){return "<li>"+esc(String(x))+"</li>";}).join("")+"</ul>"):""; }
   function renderFormReview(o){
@@ -3741,12 +3743,14 @@
       content.push({type:"text",text:"These photos show a person performing the exercise \""+formEx+"\". You are an experienced strength and conditioning coach. Review their form from the photos and give practical, specific feedback. Reply with ONLY a JSON object, no markdown: {\"summary\":one short overall line,\"good\":[up to 3 short things done well],\"fix\":[up to 3 short specific corrections],\"cues\":[up to 3 short actionable cues to try],\"safety\":one short safety note}. Base it on what is visible; if the angle or timing is unclear, say so in summary. Never diagnose injuries."});
       var out=await aiComplete([{role:"user",content:content}],1200);
       if(out==null){ fstat("The AI didn't respond. Check your key and model in settings.","err"); return; }
-      renderFormReview(parseCoachJSON(out));
+      var parsed=parseCoachJSON(out);
+      formReviews[formEx]=parsed; saveFormReviews();
+      renderFormReview(parsed);
       fstat("");
     }catch(e){
       var reason=(e&&e.message)?String(e.message):"";
       var visiony=/image|vision|modality|multimodal|not support|no endpoints|400|415/i.test(reason);
-      fstat("Couldn't review the photos"+(reason?(": "+reason.slice(0,110)):".")+(visiony?"  Your model may not read images — switch to a vision model like Gemini in Settings → AI features.":""),"err");
+      fstat("Couldn't review the photos"+(reason?(": "+reason.slice(0,110)):".")+(visiony?"  Your model may not read images. Switch to a vision model like Gemini in Settings → AI features.":""),"err");
     }finally{ btn.disabled=false; btn.textContent=ol; }
   }
   document.getElementById("formAdd").addEventListener("click", function(){ document.getElementById("formFile").click(); });
@@ -4756,6 +4760,7 @@
     var wtRaw=await sGet(WATER_KEY); if(wtRaw){ try{ water=JSON.parse(wtRaw)||{}; }catch(e){ water={}; } }
     var jRaw=await sGet(JOURNAL_KEY); if(jRaw){ try{ journal=JSON.parse(jRaw)||{}; }catch(e){ journal={}; } }
     var coRaw=await sGet(COACH_KEY); if(coRaw){ try{ coachMsgs=JSON.parse(coRaw)||[]; }catch(e){ coachMsgs=[]; } }
+    var frRaw=await sGet(FORM_KEY); if(frRaw){ try{ formReviews=JSON.parse(frRaw)||{}; }catch(e){ formReviews={}; } }
     if(!latestFor("weight")){ var tk=keyOf(new Date()); if(!body[tk]) body[tk]={}; body[tk].weight=DEFAULT_WEIGHT; await sSet(BODY_KEY, JSON.stringify(body)); }
     await migrateSchema();
     document.getElementById("loading").style.display="none";
