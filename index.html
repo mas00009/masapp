@@ -871,15 +871,14 @@
   #tab-lift .wk-repeat:active{background:var(--surface-2)}
 
   /* water */
-  #tab-food .water{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 14px;margin-bottom:9px}
-  #tab-food .water .wd-ico{width:30px;height:30px;border-radius:9px;background:color-mix(in srgb,var(--blue) 15%,transparent);display:grid;place-items:center;flex:none}
-  #tab-food .water .wd-ico svg{width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  #tab-food .water .wd-txt{flex:1;min-width:0}
-  #tab-food .water .wd-v{font-family:var(--ff-num);font-size:15px;font-weight:700;color:var(--text)}
+  #tab-food .water{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px 8px 6px 12px;margin-bottom:9px}
+  #tab-food .water .wd-ico{width:22px;height:22px;border-radius:7px;background:color-mix(in srgb,var(--blue) 15%,transparent);display:grid;place-items:center;flex:none}
+  #tab-food .water .wd-ico svg{width:13px;height:13px;stroke:var(--blue);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  #tab-food .water .wd-l{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;flex:1;min-width:0}
+  #tab-food .water .wd-v{font-family:var(--ff-num);font-size:14px;font-weight:700;color:var(--text);flex:none;white-space:nowrap}
   #tab-food .water .wd-v small{font-size:10px;color:var(--muted);font-weight:500;margin-left:4px}
-  #tab-food .water .wd-l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:1px}
   #tab-food .water .wd-btns{display:flex;gap:6px;flex:none}
-  #tab-food .water .wd-btns button{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:17px;display:grid;place-items:center;cursor:pointer}
+  #tab-food .water .wd-btns button{width:26px;height:26px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:16px;line-height:1;display:grid;place-items:center;cursor:pointer}
   #tab-food .water .wd-btns button:active{background:var(--border)}
 
   /* coach follow-up */
@@ -1112,10 +1111,8 @@
 
   <div class="water">
     <span class="wd-ico"><svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg></span>
-    <div class="wd-txt">
-      <div class="wd-v"><span id="waterVal">0</span><small id="waterMl">0 mL</small></div>
-      <div class="wd-l">Water</div>
-    </div>
+    <span class="wd-l">Water</span>
+    <span class="wd-v"><span id="waterVal">0</span><small id="waterMl">0 mL</small></span>
     <div class="wd-btns">
       <button id="waterMinus" aria-label="Remove a cup">−</button>
       <button id="waterPlus" aria-label="Add a cup">+</button>
