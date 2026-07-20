@@ -2596,7 +2596,7 @@
       if(out==null){ pstat("AI didn't respond. Check your key in Settings → AI features.","err"); return; }
       fillNewFood(parseMacroJSON(out));
       photoQueue=[]; pstat(""); renderPhotoTray();
-      setStatus("Read from your photos. Check the numbers, then tap Add to meal.","ok");
+      setStatus("Read — check the numbers, then add.","ok");
     }catch(e){
       var reason=(e&&e.message)?String(e.message):"";
       var visiony=/image|vision|modality|multimodal|not support|no endpoints|content|400|415/i.test(reason);
