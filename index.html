@@ -629,10 +629,16 @@
   #exList .ex-grp-body{padding:0 8px 8px}
   #exList .ex-sec-l{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:6px 4px 4px}
   #exList .ex-sec-l:first-child{padding-top:2px}
-  #exList .exopt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 11px;font-family:var(--ff-ui);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:5px}
+  #exList .exopt{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:4px 5px 4px 11px;font-family:var(--ff-ui);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:5px}
   #exList .exopt:last-child{margin-bottom:0}
   #exList .exopt:active{background:var(--border)}
-  #exList .exopt.custom{color:var(--protein);font-weight:700;margin-bottom:8px}
+  #exList .exopt.custom{display:block;padding:10px 11px;color:var(--protein);font-weight:700;margin-bottom:8px}
+  #exList .exopt-name{flex:1;min-width:0;padding:6px 0}
+  #exList .exopt-edit{flex:none;width:32px;height:32px;display:grid;place-items:center;background:transparent;border:none;color:var(--faint);cursor:pointer;border-radius:8px;padding:0}
+  #exList .exopt-edit:active{background:var(--border);color:var(--text)}
+  #exList .exopt-edit svg{width:15px;height:15px}
+  #exList .exopt-input{flex:1;min-width:0;background:var(--surface);border:1px solid var(--protein);color:var(--text);border-radius:8px;padding:7px 9px;font-family:var(--ff-ui);font-size:14px;outline:none}
+  #exList .exopt-save{flex:none;width:32px;height:32px;display:grid;place-items:center;background:var(--protein);border:none;color:#2a0710;cursor:pointer;border-radius:8px;font-size:15px;padding:0}
 
   /* workout plans (templates) */
   #tab-lift .wk-plan-quick{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:2px 0 12px}
@@ -3329,6 +3335,7 @@
   /* ---------- workout / gym ---------- */
   var WORKOUT_KEY="mt_workouts", REST_KEY="mt_rest";
   var workouts={}, wCurrent=new Date(), restDefault=90, REST_STEPS=[60,90,120,150,180], exMatches=[], exGroupOpen={};
+  var EXRENAMES_KEY="mt_ex_renames", EX_RENAMES={};
   var EX_LIBRARY=[
     {g:"Chest",sections:[
       {s:"Free weights",items:["Barbell Bench Press","Dumbbell Bench Press","Incline Barbell Bench Press","Incline Dumbbell Press","Decline Bench Press","Dumbbell Fly","Push-up","Weighted Dip"]},
@@ -3444,6 +3451,35 @@
     document.getElementById("wkSets").textContent=stt.done+"/"+stt.tot;
     setWkTop(stt);
   }
+  function exDisplay(orig){ return EX_RENAMES[orig]||orig; }
+  function saveExRenames(){ sSet(EXRENAMES_KEY, JSON.stringify(EX_RENAMES)); }
+  var EX_PEN_SVG="<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'/></svg>";
+  function exOptHTML(orig){
+    var disp=exDisplay(orig);
+    return "<div class='exopt' role='button' tabindex='0' data-exname=\""+esc(disp)+"\">"+
+      "<span class='exopt-name'>"+esc(disp)+"</span>"+
+      "<button type='button' class='exopt-edit' data-ex-rename=\""+esc(orig)+"\" aria-label='Rename'>"+EX_PEN_SVG+"</button>"+
+    "</div>";
+  }
+  function commitRename(orig, val){
+    val=(val||"").trim();
+    if(!val || val===orig) delete EX_RENAMES[orig]; else EX_RENAMES[orig]=val;
+    saveExRenames();
+    renderExList(document.getElementById("exSearch").value);
+  }
+  function startRenameRow(row, orig){
+    if(!row) return;
+    row.classList.add("editing"); row.removeAttribute("data-exname");
+    row.innerHTML="<input class='exopt-input' type='text' value=\""+esc(exDisplay(orig))+"\" autocomplete='off' spellcheck='false'>"+
+      "<button type='button' class='exopt-save' data-ex-save=\""+esc(orig)+"\" aria-label='Save name'>✓</button>";
+    var inp=row.querySelector(".exopt-input");
+    if(inp){ inp.focus(); try{ inp.select(); }catch(e){}
+      inp.addEventListener("keydown", function(ev){
+        if(ev.key==="Enter"){ ev.preventDefault(); commitRename(orig, inp.value); }
+        else if(ev.key==="Escape"){ ev.preventDefault(); renderExList(document.getElementById("exSearch").value); }
+      });
+    }
+  }
   function renderExList(q){
     var box=document.getElementById("exList"); q=(q||"").trim().toLowerCase();
     var raw=document.getElementById("exSearch").value.trim(), html="";
@@ -3452,8 +3488,8 @@
       html+="<button class='exopt custom' data-exc='1'>+ Add \u201c"+esc(raw)+"\u201d</button>";
     }
     if(q){
-      exMatches=COMMON_EX.filter(function(n){ return n.toLowerCase().indexOf(q)>=0; });
-      html+=exMatches.map(function(n){ return "<button type='button' class='exopt' data-exname='"+esc(n)+"'>"+esc(n)+"</button>"; }).join("");
+      exMatches=COMMON_EX.filter(function(n){ return n.toLowerCase().indexOf(q)>=0 || exDisplay(n).toLowerCase().indexOf(q)>=0; });
+      html+=exMatches.map(exOptHTML).join("");
       box.innerHTML=html || "<div class='wk-empty'>No matches. Type a custom name above.</div>";
       return;
     }
@@ -3461,9 +3497,7 @@
       var items=[]; gr.sections.forEach(function(sec){ sec.items.forEach(function(n){ items.push({n:n,s:sec.s}); }); });
       var open=!!exGroupOpen[gr.g];
       var body=open?"<div class='ex-grp-body'>"+gr.sections.map(function(sec){
-        return "<div class='ex-sec-l'>"+esc(sec.s)+"</div>"+sec.items.map(function(n){
-          return "<button type='button' class='exopt' data-exname='"+esc(n)+"'>"+esc(n)+"</button>";
-        }).join("");
+        return "<div class='ex-sec-l'>"+esc(sec.s)+"</div>"+sec.items.map(exOptHTML).join("");
       }).join("")+"</div>":"";
       return "<div class='ex-grp'><button type='button' class='ex-grp-h' data-exgrp='"+esc(gr.g)+"' aria-expanded='"+(open?"true":"false")+"'><span>"+esc(gr.g)+"</span><span class='ex-grp-n'>"+items.length+"</span><span class='ex-grp-chev'>"+(open?"\u25be":"\u25b8")+"</span></button>"+body+"</div>";
     }).join("");
@@ -3594,6 +3628,10 @@
       if(!wasOpen){ var grp=gh.closest(".ex-grp"); if(grp) setTimeout(function(){ scrollExListToEl(grp, 10); }, 40); }
       return;
     }
+    var pen=e.target.closest("[data-ex-rename]");
+    if(pen){ startRenameRow(pen.closest(".exopt"), pen.getAttribute("data-ex-rename")); return; }
+    var sv=e.target.closest("[data-ex-save]");
+    if(sv){ var ip=sv.parentNode.querySelector(".exopt-input"); commitRename(sv.getAttribute("data-ex-save"), ip?ip.value:""); return; }
     var b=e.target.closest("[data-exname],[data-exc]"); if(!b) return;
     var name = b.hasAttribute("data-exc") ? document.getElementById("exSearch").value.trim() : b.getAttribute("data-exname");
     if(name){ addExercise(name); closeSheets(); }
@@ -4584,6 +4622,7 @@
     var scRaw=await sGet(SCHED_KEY); if(scRaw){ try{ schedule=JSON.parse(scRaw); }catch(e){ schedule=[]; } }
     var wRaw=await sGet(WORKOUT_KEY); if(wRaw){ try{ workouts=JSON.parse(wRaw); }catch(e){ workouts={}; } }
     var plRaw=await sGet(PLANS_KEY); if(plRaw){ try{ plans=JSON.parse(plRaw)||[]; }catch(e){ plans=[]; } } else { seedPlans(); }
+    var exrRaw=await sGet(EXRENAMES_KEY); if(exrRaw){ try{ EX_RENAMES=JSON.parse(exrRaw)||{}; }catch(e){ EX_RENAMES={}; } }
     var rRaw=await sGet(REST_KEY); if(rRaw){ var rv=parseInt(rRaw,10); if(isFinite(rv)&&rv>0) restDefault=rv; }
     var wtRaw=await sGet(WATER_KEY); if(wtRaw){ try{ water=JSON.parse(wtRaw)||{}; }catch(e){ water={}; } }
     var jRaw=await sGet(JOURNAL_KEY); if(jRaw){ try{ journal=JSON.parse(jRaw)||{}; }catch(e){ journal={}; } }
