@@ -546,8 +546,11 @@
   #tab-plan .sess{display:flex;align-items:center;gap:10px;padding:9px 7px;border-top:1px solid var(--border);cursor:pointer}
   #tab-plan .sess:active{background:var(--surface-2)}
   #tab-plan .sess .bar{width:3px;align-self:stretch;border-radius:2px;flex:none;min-height:26px}
-  #tab-plan .sess .stime{font-family:var(--ff-num);font-size:12px;font-weight:700;color:var(--text);min-width:52px;flex:none;white-space:nowrap}
+  #tab-plan .sess .stimew{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:52px;flex:none}
+  #tab-plan .sess .stime{font-family:var(--ff-num);font-size:12px;font-weight:700;color:var(--text);white-space:nowrap}
   #tab-plan .sess .stime.none{color:var(--faint);font-weight:500}
+  #tab-plan .sess .sdur{font-family:var(--ff-num);font-size:10px;font-weight:600;color:var(--faint);white-space:nowrap;letter-spacing:.02em}
+  #tab-plan .sess .sdur.actual{color:var(--blue)}
   #tab-plan .sess .sinfo{flex:1;min-width:0}
   #tab-plan .sess .stitle{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #tab-plan .sess .snote{font-family:var(--ff-num);font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1688,6 +1691,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="field"><label>Duration (min)</label><input type="number" inputmode="numeric" id="schDur" min="0" placeholder="e.g. 60">
+      <div class="mono-note" id="schDurNote" style="text-align:left;margin:5px 2px 0;display:none"></div>
     </div>
     <button class="primary" id="schSave">Save session</button>
     <button class="ghost" id="schOpenGym" style="display:none">Open this in Gym</button>
@@ -2981,7 +2987,9 @@
   function collectSchedule(){
     return schedule.map(function(s){
       var dk=schedDateKey(s);
-      return {date:dk||null, day:DAYS_FULL[s.day], type:s.type, title:s.title||"", time:s.time?fmtSchedTime(s.time):""};
+      var eff=schedEffectiveDur(s);
+      return {date:dk||null, day:DAYS_FULL[s.day], type:s.type, title:s.title||"", time:s.time?fmtSchedTime(s.time):"",
+        plannedDurationMin:s.dur||null, durationMin:eff.min||null, durationIsActual:eff.actual};
     }).filter(function(s){ return s.date; });
   }
   function collectWaterWindow(days){
@@ -3101,7 +3109,7 @@
     var introEl=document.querySelector("#tab-coach .coach-intro"); if(introEl) introEl.style.display="none";
     var data=collectData();
     var sys="You are a supportive, practical personal health and fitness coach built into the user's own tracking app. "+
-      "You receive a JSON snapshot of everything they have logged: profile and maintenance estimates, macro targets, nutrition history (7 and 30 days with daily totals, top foods and meal patterns), weight history, body measurements over time, body composition, supplement adherence (7 and 30 days), training (7 and 30 days of sessions with volume, sets, exercises, session duration in minutes where recorded, PRs), their weekly schedule (gym, basketball, swimming), hydration over 30 days, journal notes, and any userContext they typed before asking. "+
+      "You receive a JSON snapshot of everything they have logged: profile and maintenance estimates, macro targets, nutrition history (7 and 30 days with daily totals, top foods and meal patterns), weight history, body measurements over time, body composition, supplement adherence (7 and 30 days), training (7 and 30 days of sessions with volume, sets, exercises, session duration in minutes where recorded, PRs), their weekly schedule (gym, basketball, swimming, each with planned duration and, for gym, actual tracked duration where logged), hydration over 30 days, journal notes, and any userContext they typed before asking. "+
       "Your job is to give ADVICE, not a recap. Do not simply restate what the numbers say. Interpret patterns, identify what is working and what is not, and tell them what to change. Compare 7-day vs 30-day windows, spot trends in weight and measurements, comment on food variety and protein consistency, judge whether training volume and session length support their goal, relate schedule to recovery, and factor in notes about sleep or soreness. "+
       "If measuredMaintenanceKcal is present, prefer it over the formula estimate. Use body composition when available. Be specific with numbers but always translate them into actionable guidance. "+
       "Never promote extreme restriction or unsafe practices. For medical concerns, suggest a qualified professional; do not diagnose. "+
@@ -3179,6 +3187,18 @@
   ];
   var STYPE_DEFAULT_TIME={gym:"14:00",basketball:"19:30",swimming:"14:00"};
   function defaultTimeForType(t){ return STYPE_DEFAULT_TIME[t] || STYPE_DEFAULT_TIME.gym; }
+  var STYPE_DEFAULT_DUR={gym:60,basketball:90,swimming:45};
+  function defaultDurForType(t){ return STYPE_DEFAULT_DUR[t]!=null ? STYPE_DEFAULT_DUR[t] : 60; }
+  // Actual tracked duration of the gym workout on a given date, if any.
+  function schedGymActualDur(dateKey){ var w=workouts[dateKey]; return w ? wkDurationMin(w) : 0; }
+  // Effective duration for a schedule session: for gym, the actual tracked
+  // workout duration supersedes the planned value once it exists; other
+  // session types always use the value entered in the calendar.
+  function schedEffectiveDur(s){
+    var planned=s.dur||0;
+    if(s.type==="gym"){ var actual=schedGymActualDur(schedDateKey(s)); if(actual>0) return {min:actual, actual:true, planned:planned}; }
+    return {min:planned, actual:false, planned:planned};
+  }
   function fmtSchedTime(t){
     if(!t) return "";
     var m=String(t).match(/^(\d{1,2}):(\d{2})/);
@@ -3347,9 +3367,13 @@
     var pn=(s.type==="gym"&&s.plan)?(planById(s.plan)?planById(s.plan).name:""):"";
     var title=s.title||pn||meta.label;
     var subtitle=s.note||(pn&&s.title?pn:"");
+    var eff=schedEffectiveDur(s), durTxt=eff.min>0?fmtDur(eff.min):"";
     return "<div class='sess' data-sess='"+s.id+"'>"+
       "<span class='bar' style='background:"+meta.color+"'></span>"+
-      "<span class='stime"+(s.time?"":" none")+"'>"+(s.time?esc(fmtSchedTime(s.time)):"\u2014")+"</span>"+
+      "<span class='stimew'>"+
+        "<span class='stime"+(s.time?"":" none")+"'>"+(s.time?esc(fmtSchedTime(s.time)):"\u2014")+"</span>"+
+        (durTxt?"<span class='sdur"+(eff.actual?" actual":"")+"'>"+esc(durTxt)+"</span>":"")+
+      "</span>"+
       "<span class='sinfo'><span class='stitle'>"+esc(title)+"</span>"+
       (subtitle?"<span class='snote'>"+esc(subtitle)+"</span>":"")+"</span>"+
       "<span class='schip' style='"+chip+"'>"+esc(meta.label)+"</span>"+
@@ -3394,6 +3418,17 @@
     var isGym=document.getElementById("schType").value==="gym";
     document.getElementById("schOpenGym").style.display = (editSchedId && isGym) ? "block" : "none";
   }
+  // For a gym session that has a tracked workout, show that the actual
+  // duration will supersede the planned number entered here.
+  function updateSchDurNote(){
+    var note=document.getElementById("schDurNote"); if(!note) return;
+    var isGym=document.getElementById("schType").value==="gym";
+    var s = editSchedId ? schedule.filter(function(x){return x.id===editSchedId;})[0] : null;
+    var actual = (isGym && s) ? schedGymActualDur(schedDateKey(s)) : 0;
+    if(actual>0){ note.textContent="Actual workout tracked: "+fmtDur(actual)+". That overrides the planned time above."; note.style.display="block"; }
+    else if(isGym){ note.textContent="Planned time. The Gym tab updates this to your actual workout length once you log sets."; note.style.display="block"; }
+    else { note.style.display="none"; }
+  }
   function openSchedule(id, dayPre){
     editSchedId=id||null;
     var s = id ? schedule.filter(function(x){return x.id===id;})[0] : null;
@@ -3405,9 +3440,11 @@
     document.getElementById("schType").value = s ? s.type : "gym";
     document.getElementById("schTitleInput").value = s ? (s.title||"") : "";
     setSchTime(s ? (s.time||defaultTimeForType(s.type)) : defaultTimeForType(document.getElementById("schType").value));
+    document.getElementById("schDur").value = s ? (s.dur||"") : defaultDurForType(document.getElementById("schType").value);
     toggleSchTimePicker(false);
     document.getElementById("schDelete").style.display = s ? "block" : "none";
     toggleSchGymBits();
+    updateSchDurNote();
     openSheet("scheduleSheet");
     setTimeout(function(){ document.getElementById("schTitleInput").focus(); },260);
   }
@@ -3417,11 +3454,12 @@
     var type=document.getElementById("schType").value||"gym";
     var title=document.getElementById("schTitleInput").value.trim();
     var time=document.getElementById("schTime").value||defaultTimeForType(type);
+    var dur=Math.max(0,Math.round(num(document.getElementById("schDur").value)))||0;
     if(editSchedId){
       var s=schedule.filter(function(x){return x.id===editSchedId;})[0];
-      if(s){ s.day=day; s.weekStart=weekStart; s.type=type; s.title=title; s.time=time; }
+      if(s){ s.day=day; s.weekStart=weekStart; s.type=type; s.title=title; s.time=time; s.dur=dur; }
     } else {
-      schedule.push({id:uid(),day:day,weekStart:weekStart,type:type,title:title,time:time});
+      schedule.push({id:uid(),day:day,weekStart:weekStart,type:type,title:title,time:time,dur:dur});
     }
     saveSchedule(); renderPlan(); closeSheets();
   }
@@ -4196,8 +4234,8 @@
   /* ---------- calendar -> gym ---------- */
   function weekdayDateThisWeek(dayIdx){ return planWeekDate(dayIdx); }
   document.getElementById("schType").addEventListener("change", function(){
-    if(!editSchedId) setSchTime(defaultTimeForType(document.getElementById("schType").value));
-    toggleSchGymBits();
+    if(!editSchedId){ setSchTime(defaultTimeForType(document.getElementById("schType").value)); document.getElementById("schDur").value=defaultDurForType(document.getElementById("schType").value); }
+    toggleSchGymBits(); updateSchDurNote();
   });
   document.getElementById("schTimeTap").addEventListener("click", function(){ toggleSchTimePicker(); });
   document.getElementById("schOpenGym").addEventListener("click", function(){
