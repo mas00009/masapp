@@ -570,7 +570,10 @@
   #tab-lift .wk-hero-row{display:flex;align-items:stretch;gap:8px}
   #tab-lift .wk-hero-stats{flex:1;min-width:0;display:flex;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
   #tab-lift .wk-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px;text-align:center;min-width:0}
-  #tab-lift .wk-stat-sm{flex:none;width:68px}
+  #tab-lift .wk-stat-sm{flex:none;width:58px}
+  #tab-lift .wk-stat-dur{cursor:pointer}
+  #tab-lift .wk-stat-dur:active{background:var(--surface-2)}
+  #tab-lift .wk-stat-dur.manual .v{color:var(--blue)}
   #tab-lift .wk-stat-top{flex:1;min-width:0;padding:8px 6px;gap:2px}
   #tab-lift .wk-stat + .wk-stat{border-left:1px solid var(--border)}
   #tab-lift .wk-stat .v{font-family:var(--ff-num);font-size:14px;font-weight:700;color:var(--text);line-height:1.1}
@@ -1291,6 +1294,7 @@
           <div class="wk-hero-stats">
             <div class="wk-stat wk-stat-sm"><span class="v" id="wkSets">0/0</span><span class="l">sets done</span></div>
             <div class="wk-stat wk-stat-sm"><span class="v" id="wkExs">0</span><span class="l">exercises</span></div>
+            <div class="wk-stat wk-stat-sm wk-stat-dur" id="wkDurStat" role="button" tabindex="0" aria-label="Set workout duration"><span class="v" id="wkDur">-</span><span class="l">duration</span></div>
             <div class="wk-stat wk-stat-top"><span class="v" id="wkTop">-</span><span class="l wk-top-ex" id="wkTopEx"></span></div>
           </div>
           <button type="button" class="wk-add" id="wkAddExercise" aria-label="Add exercise">+ Add</button>
@@ -2955,7 +2959,7 @@
         (e.sets||[]).forEach(function(s){ st++; if(s.done){ sd++; vol+=num(s.w)*num(s.reps); } });
       });
       vol=Math.round(vol);
-      var row={date:k, volumeKg:vol, setsCompleted:sd, setsPlanned:st, exercises:exNames, plan:plan};
+      var row={date:k, volumeKg:vol, setsCompleted:sd, setsPlanned:st, durationMin:wkDurationMin(w)||null, exercises:exNames, plan:plan};
       days30.push(row);
       if(k>=since7){ days7.push(row); totalVol7+=vol; sessions7++; setsDone+=sd; setsTotal+=st; }
     }
@@ -3097,8 +3101,8 @@
     var introEl=document.querySelector("#tab-coach .coach-intro"); if(introEl) introEl.style.display="none";
     var data=collectData();
     var sys="You are a supportive, practical personal health and fitness coach built into the user's own tracking app. "+
-      "You receive a JSON snapshot of everything they have logged: profile and maintenance estimates, macro targets, nutrition history (7 and 30 days with daily totals, top foods and meal patterns), weight history, body measurements over time, body composition, supplement adherence (7 and 30 days), training (7 and 30 days of sessions with volume, sets, exercises, PRs), their weekly schedule (gym, basketball, swimming), hydration over 30 days, journal notes, and any userContext they typed before asking. "+
-      "Your job is to give ADVICE, not a recap. Do not simply restate what the numbers say. Interpret patterns, identify what is working and what is not, and tell them what to change. Compare 7-day vs 30-day windows, spot trends in weight and measurements, comment on food variety and protein consistency, judge whether training volume supports their goal, relate schedule to recovery, and factor in notes about sleep or soreness. "+
+      "You receive a JSON snapshot of everything they have logged: profile and maintenance estimates, macro targets, nutrition history (7 and 30 days with daily totals, top foods and meal patterns), weight history, body measurements over time, body composition, supplement adherence (7 and 30 days), training (7 and 30 days of sessions with volume, sets, exercises, session duration in minutes where recorded, PRs), their weekly schedule (gym, basketball, swimming), hydration over 30 days, journal notes, and any userContext they typed before asking. "+
+      "Your job is to give ADVICE, not a recap. Do not simply restate what the numbers say. Interpret patterns, identify what is working and what is not, and tell them what to change. Compare 7-day vs 30-day windows, spot trends in weight and measurements, comment on food variety and protein consistency, judge whether training volume and session length support their goal, relate schedule to recovery, and factor in notes about sleep or soreness. "+
       "If measuredMaintenanceKcal is present, prefer it over the formula estimate. Use body composition when available. Be specific with numbers but always translate them into actionable guidance. "+
       "Never promote extreme restriction or unsafe practices. For medical concerns, suggest a qualified professional; do not diagnose. "+
       "Keep each section to 2-4 short sentences. Speak directly to the user. "+
@@ -3468,6 +3472,20 @@
   function wSession(){ var k=wKey(); if(!workouts[k]) workouts[k]={exercises:[]}; if(!workouts[k].exercises) workouts[k].exercises=[]; return workouts[k]; }
   function saveWorkouts(){ sSet(WORKOUT_KEY, JSON.stringify(workouts)); }
   function exById(id){ return wSession().exercises.filter(function(e){return e.id===id;})[0]; }
+  // Session duration in minutes. A manual override (durMin) wins; otherwise
+  // it is auto-derived from the span between the first and last set marked
+  // done, so it reflects how long you were actually training.
+  function wkDurationMin(w){
+    if(!w) return 0;
+    if(typeof w.durMin==="number" && w.durMin>0) return w.durMin;
+    if(w.startedAt && w.lastAt && w.lastAt>w.startedAt) return Math.round((w.lastAt-w.startedAt)/60000);
+    return 0;
+  }
+  function fmtDur(m){
+    m=Math.round(m||0); if(m<=0) return "-";
+    if(m<60) return m+"m";
+    var h=Math.floor(m/60), r=m%60; return r?h+"h "+r+"m":h+"h";
+  }
   function wkStats(){
     var s=wSession(), done=0, tot=0, top=0, topEx="";
     s.exercises.forEach(function(e){ (e.sets||[]).forEach(function(st){ tot++; if(st.done){ done++; var w=num(st.w); if(w>top){ top=w; topEx=e.name||""; } } }); });
@@ -3539,6 +3557,8 @@
     var s=wSession(), stt=wkStats();
     document.getElementById("wkSets").textContent=stt.done+"/"+stt.tot;
     document.getElementById("wkExs").textContent=stt.ex;
+    var durEl=document.getElementById("wkDur"); if(durEl) durEl.textContent=fmtDur(wkDurationMin(s));
+    var durStat=document.getElementById("wkDurStat"); if(durStat) durStat.classList.toggle("manual", typeof s.durMin==="number" && s.durMin>0);
     setWkTop(stt);
     list.innerHTML = s.exercises.length ? (s.exercises.map(excCard).join("")+"<button type='button' class='wk-saveplan' data-save-plan>Save as plan</button>") : (function(){
       var lw=lastWorkoutBefore(wKey());
@@ -3646,7 +3666,9 @@
       if(exs&&exs.sets[ssi]){ exs.sets[ssi].w=num(sg.getAttribute("data-sugg")); saveWorkouts(); renderWorkout(); } return; }
     var dn=e.target.closest(".set-done");
     if(dn){ var row=dn.closest(".set-row"), ex3=exById(row.getAttribute("data-ex")), si=+row.getAttribute("data-set");
-      if(ex3&&ex3.sets[si]){ ex3.sets[si].done=!ex3.sets[si].done; var nowDone=ex3.sets[si].done; saveWorkouts(); renderWorkout(); if(nowDone) startRest(ex3.name, si+1); } return; }
+      if(ex3&&ex3.sets[si]){ ex3.sets[si].done=!ex3.sets[si].done; var nowDone=ex3.sets[si].done;
+        if(nowDone && isToday(wCurrent)){ var ws=wSession(), tnow=Date.now(); if(!ws.startedAt) ws.startedAt=tnow; ws.lastAt=tnow; }
+        saveWorkouts(); renderWorkout(); if(nowDone) startRest(ex3.name, si+1); } return; }
   });
   document.getElementById("wkList").addEventListener("change", function(e){
     var isW=e.target.classList&&e.target.classList.contains("set-w");
@@ -3722,6 +3744,20 @@
     list.addEventListener("click", function(e){ if(lpDidDrag){ lpDidDrag=false; e.stopPropagation(); e.preventDefault(); } }, true);
   })();
   document.getElementById("wkAddExercise").addEventListener("click", openExercisePicker);
+  (function(){
+    var ds=document.getElementById("wkDurStat"); if(!ds) return;
+    function editDur(){
+      var w=wSession(), cur=wkDurationMin(w);
+      var ans=window.prompt("Workout duration in minutes (leave blank to auto-track from your sets):", cur>0?String(cur):"");
+      if(ans===null) return;
+      ans=ans.trim();
+      if(ans===""){ delete w.durMin; }
+      else{ var m=Math.round(num(ans)); if(m>0) w.durMin=m; else delete w.durMin; }
+      saveWorkouts(); renderWorkout();
+    }
+    ds.addEventListener("click", editDur);
+    ds.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); editDur(); } });
+  })();
   document.getElementById("wkPrev").addEventListener("click", function(){ wCurrent.setDate(wCurrent.getDate()-1); wCurrent=new Date(wCurrent); pastOpen={}; renderWorkout(); });
   document.getElementById("wkNext").addEventListener("click", function(){ wCurrent.setDate(wCurrent.getDate()+1); wCurrent=new Date(wCurrent); pastOpen={}; renderWorkout(); });
   document.getElementById("exSearch").addEventListener("input", function(){ renderExList(this.value); });
