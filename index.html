@@ -607,6 +607,8 @@
   #tab-lift .set-done svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
   #tab-lift .set-row.done .set-done{background:var(--ok);border-color:var(--ok);color:#06231a}
   #tab-lift .set-row.done .set-fld{border-color:color-mix(in srgb,var(--ok) 28%,var(--border))}
+  #tab-lift .set-x{width:24px;height:30px;flex:none;background:none;border:none;color:var(--faint);font-size:17px;line-height:1;cursor:pointer;padding:0;display:grid;place-items:center}
+  #tab-lift .set-x:active{color:var(--danger)}
   #tab-lift .set-sugg{flex:none;border:none;background:color-mix(in srgb,var(--protein) 15%,transparent);color:var(--protein);font-family:var(--ff-num);font-size:10px;font-weight:700;padding:3px 7px;border-radius:7px;cursor:pointer;white-space:nowrap}
   #tab-lift .set-sugg:active{background:color-mix(in srgb,var(--protein) 28%,transparent)}
   #tab-lift .exc-dur{width:26px;height:26px;flex:none;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--faint);display:grid;place-items:center;cursor:pointer;padding:0}
@@ -3464,7 +3466,8 @@
       "<span class='set-n'>"+(i+1)+"</span>"+
       "<span class='set-fld'><input class='set-w' type='number' inputmode='decimal' value='"+wv+"' placeholder='"+wPh+"'>"+sugg+"<span class='u'>kg</span></span>"+
       "<span class='set-fld'><input class='set-r' type='number' inputmode='numeric' value='"+rv+"' placeholder='"+(isDur?"30":"0")+"'><span class='u'>"+(isDur?"sec":"reps")+"</span></span>"+
-      "<button class='set-done' aria-label='Mark set done'><svg viewBox='0 0 24 24'><polyline points='5 13 10 18 19 7'/></svg></button></div>";
+      "<button class='set-done' aria-label='Mark set done'><svg viewBox='0 0 24 24'><polyline points='5 13 10 18 19 7'/></svg></button>"+
+      "<button class='set-x' data-del-setrow='"+exId+"' data-i='"+i+"' aria-label='Remove this set'>×</button></div>";
   }
   var collapsedExc={};              // today: ids explicitly collapsed (persisted)
   var pastOpen={};                  // past days: ids expanded in the current view (not saved)
@@ -3481,7 +3484,6 @@
     return "<div class='exc"+(collapsed?" collapsed":"")+"' data-ex='"+e.id+"'>"+
       "<div class='exc-head'><span class='exc-title' data-ex-collapse='"+e.id+"'><span class='exc-chev' aria-hidden='true'><svg viewBox='0 0 24 24'><polyline points='9 6 15 12 9 18'/></svg></span><span class='en'>"+esc(e.name)+"</span>"+lastLine+"</span>"+pbBadge+
         "<button type='button' class='exc-rest' data-rest-cycle aria-label='Rest timer length'>"+restDefault+"s</button>"+
-        ((e.sets&&e.sets.length)?"<button class='set-del' data-del-set='"+e.id+"' aria-label='Remove last set'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M6 12h12'/></svg></button>":"")+
         "<button class='set-add' data-add-set='"+e.id+"' aria-label='Add set'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12 6v12M6 12h12'/></svg></button>"+
         "<button class='exc-form' data-form='"+encodeURIComponent(e.name)+"' aria-label='Form review'><svg viewBox='0 0 24 24'><path d='M4 8.5A1.5 1.5 0 0 1 5.5 7h1.7l1-1.6A1.5 1.5 0 0 1 10.5 4.7h3a1.5 1.5 0 0 1 1.3.7l1 1.6h1.7A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5v-9Z'/><circle cx='12' cy='12.5' r='3.2'/></svg></button>"+
         "<button class='exc-hist' data-hist='"+encodeURIComponent(e.name)+"' aria-label='History'><svg viewBox='0 0 24 24'><path d='M5 19V10M12 19V5M19 19v-6'/></svg></button>"+
@@ -3596,6 +3598,8 @@
     if(addS){ var ex=exById(addS.getAttribute("data-add-set")); if(ex){ var last=ex.sets[ex.sets.length-1]; ex.sets.push({w:last?last.w:"",reps:last?last.reps:"",done:false}); saveWorkouts(); renderWorkout(); } return; }
     var delS=e.target.closest("[data-del-set]");
     if(delS){ var ex2=exById(delS.getAttribute("data-del-set")); if(ex2&&ex2.sets.length){ ex2.sets.pop(); saveWorkouts(); renderWorkout(); } return; }
+    var delR=e.target.closest("[data-del-setrow]");
+    if(delR){ var exr=exById(delR.getAttribute("data-del-setrow")), ii=+delR.getAttribute("data-i"); if(exr&&exr.sets&&ii>=0&&ii<exr.sets.length){ exr.sets.splice(ii,1); saveWorkouts(); renderWorkout(); } return; }
     var rm=e.target.closest("[data-remove-ex]");
     if(rm){ var id=rm.getAttribute("data-remove-ex"); wSession().exercises=wSession().exercises.filter(function(x){return x.id!==id;}); saveWorkouts(); renderWorkout(); return; }
     var dt=e.target.closest("[data-dur-toggle]");
