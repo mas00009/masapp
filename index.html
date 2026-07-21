@@ -3466,7 +3466,10 @@
       "<span class='set-fld'><input class='set-r' type='number' inputmode='numeric' value='"+rv+"' placeholder='"+(isDur?"30":"0")+"'><span class='u'>"+(isDur?"sec":"reps")+"</span></span>"+
       "<button class='set-done' aria-label='Mark set done'><svg viewBox='0 0 24 24'><polyline points='5 13 10 18 19 7'/></svg></button></div>";
   }
-  var collapsedExc={};
+  var collapsedExc={};              // today: ids explicitly collapsed (persisted)
+  var pastOpen={};                  // past days: ids expanded in the current view (not saved)
+  var WKCOLLAPSE_KEY="mt_wk_collapsed";
+  function saveCollapsed(){ try{ sSet(WKCOLLAPSE_KEY, JSON.stringify(collapsedExc)); }catch(e){} }
   function excCard(e){
     var vol=0; (e.sets||[]).forEach(function(st){ if(st.done) vol+=num(st.w)*num(st.reps); });
     var setsHtml=(e.sets||[]).map(function(st,i){ return setRow(e,st,i); }).join("");
@@ -3474,7 +3477,7 @@
     var lastLine="";
     if(last){ var ls=fmtSetsCompact(last.sets); if(ls) lastLine="<span class='exc-last'>"+esc(ls)+"</span>"; }
     var pbBadge = pb ? "<span class='exc-pb'>PB "+pb.w+"\u00d7"+pb.r+"</span>" : "";
-    var collapsed = !!collapsedExc[e.id];
+    var collapsed = isToday(wCurrent) ? !!collapsedExc[e.id] : !pastOpen[e.id];
     return "<div class='exc"+(collapsed?" collapsed":"")+"' data-ex='"+e.id+"'>"+
       "<div class='exc-head'><span class='exc-title' data-ex-collapse='"+e.id+"'><span class='exc-chev' aria-hidden='true'><svg viewBox='0 0 24 24'><polyline points='9 6 15 12 9 18'/></svg></span><span class='en'>"+esc(e.name)+"</span>"+lastLine+"</span>"+pbBadge+
         "<button type='button' class='exc-rest' data-rest-cycle aria-label='Rest timer length'>"+restDefault+"s</button>"+
@@ -3575,8 +3578,10 @@
 
   document.getElementById("wkList").addEventListener("click", function(e){
     var coll=e.target.closest("[data-ex-collapse]");
-    if(coll){ var cid=coll.getAttribute("data-ex-collapse"); collapsedExc[cid]=!collapsedExc[cid];
-      var card=coll.closest(".exc"); if(card) card.classList.toggle("collapsed", !!collapsedExc[cid]); return; }
+    if(coll){ var cid=coll.getAttribute("data-ex-collapse"), nowCollapsed;
+      if(isToday(wCurrent)){ if(collapsedExc[cid]) delete collapsedExc[cid]; else collapsedExc[cid]=1; saveCollapsed(); nowCollapsed=!!collapsedExc[cid]; }
+      else { if(pastOpen[cid]) delete pastOpen[cid]; else pastOpen[cid]=1; nowCollapsed=!pastOpen[cid]; }
+      var card=coll.closest(".exc"); if(card) card.classList.toggle("collapsed", nowCollapsed); return; }
     var hist=e.target.closest("[data-hist]");
     if(hist){ openExHist(decodeURIComponent(hist.getAttribute("data-hist"))); return; }
     var fb=e.target.closest("[data-form]");
@@ -3676,8 +3681,8 @@
     list.addEventListener("click", function(e){ if(lpDidDrag){ lpDidDrag=false; e.stopPropagation(); e.preventDefault(); } }, true);
   })();
   document.getElementById("wkAddExercise").addEventListener("click", openExercisePicker);
-  document.getElementById("wkPrev").addEventListener("click", function(){ wCurrent.setDate(wCurrent.getDate()-1); wCurrent=new Date(wCurrent); renderWorkout(); });
-  document.getElementById("wkNext").addEventListener("click", function(){ wCurrent.setDate(wCurrent.getDate()+1); wCurrent=new Date(wCurrent); renderWorkout(); });
+  document.getElementById("wkPrev").addEventListener("click", function(){ wCurrent.setDate(wCurrent.getDate()-1); wCurrent=new Date(wCurrent); pastOpen={}; renderWorkout(); });
+  document.getElementById("wkNext").addEventListener("click", function(){ wCurrent.setDate(wCurrent.getDate()+1); wCurrent=new Date(wCurrent); pastOpen={}; renderWorkout(); });
   document.getElementById("exSearch").addEventListener("input", function(){ renderExList(this.value); });
   document.getElementById("exList").addEventListener("click", function(e){
     var gh=e.target.closest("[data-exgrp]");
@@ -4118,7 +4123,7 @@
   document.getElementById("schTimeTap").addEventListener("click", function(){ toggleSchTimePicker(); });
   document.getElementById("schOpenGym").addEventListener("click", function(){
     var day=parseInt(document.getElementById("schDay").value,10)||0;
-    wCurrent=weekdayDateThisWeek(day); renderWorkout();
+    wCurrent=weekdayDateThisWeek(day); pastOpen={}; renderWorkout();
     closeSheets();
     var t=document.querySelector('.tabbtn[data-tab="lift"]'); if(t) t.click();
   });
@@ -4768,6 +4773,7 @@
     var jRaw=await sGet(JOURNAL_KEY); if(jRaw){ try{ journal=JSON.parse(jRaw)||{}; }catch(e){ journal={}; } }
     var coRaw=await sGet(COACH_KEY); if(coRaw){ try{ coachMsgs=JSON.parse(coRaw)||[]; }catch(e){ coachMsgs=[]; } }
     var frRaw=await sGet(FORM_KEY); if(frRaw){ try{ formReviews=JSON.parse(frRaw)||{}; }catch(e){ formReviews={}; } }
+    var wcRaw=await sGet(WKCOLLAPSE_KEY); if(wcRaw){ try{ collapsedExc=JSON.parse(wcRaw)||{}; }catch(e){ collapsedExc={}; } }
     if(!latestFor("weight")){ var tk=keyOf(new Date()); if(!body[tk]) body[tk]={}; body[tk].weight=DEFAULT_WEIGHT; await sSet(BODY_KEY, JSON.stringify(body)); }
     await migrateSchema();
     document.getElementById("loading").style.display="none";
