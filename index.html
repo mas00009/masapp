@@ -2380,8 +2380,7 @@
   });
   document.getElementById("addFoodFromManage").addEventListener("click",function(){
     openAdd(addMeal, {saveToList:true});
-    showManualForm(true);
-    document.getElementById("nfName").focus();
+    showManualForm(true, {toEnd:true});
   });
   document.getElementById("manageList").addEventListener("click",function(e){
     var ed=e.target.closest("[data-edit]"); if(!ed) return;
@@ -2502,7 +2501,7 @@
   });
   document.getElementById("mManual").addEventListener("click", function(){
     var box=document.getElementById("nfManual");
-    showManualForm(box && box.hidden);
+    showManualForm(box && box.hidden, {toEnd:true});
   });
 
   /* OpenRouter (needs your key) */
