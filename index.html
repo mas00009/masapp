@@ -172,7 +172,8 @@
   .meal.collapsed .meal-body{display:none}
   .meal-body{padding:0 0 7px}
   .item{display:grid;grid-template-columns:minmax(0,1fr) 80px 82px;column-gap:12px;align-items:center;padding:8px 13px;border-top:1px solid var(--border)}
-  .item .info{min-width:0}
+  .item .info{min-width:0;cursor:pointer}
+  .item .info:active .nm{opacity:.55}
   .item .info .nm{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .item .info .sub{font-family:var(--ff-num);font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap}
   .qty{display:flex;align-items:center;gap:2px;justify-self:end}
@@ -1827,7 +1828,7 @@
   var CAL_GRACE = 50;
   var aiKey="", aiModel="google/gemini-3.5-flash", aiCustomModels=[];
   var current=new Date();
-  var addMeal="breakfast", editingId=null;
+  var addMeal="breakfast", editingId=null, editLogRef=null;
 
   var STARTER=[
     {name:"Musashi Shred & Burn Protein Shake",serving:"Ready-to-drink high protein shake",cal:181,p:31.7,c:3.8,f:3.6},
@@ -1954,7 +1955,7 @@
       el.className="meal"+(collapsed[m]?" collapsed":"");
       var rows = items.map(function(it){
         return "<div class='item' data-id='"+it.id+"'>"+
-          "<div class='info'><div class='nm'>"+esc(it.name)+"</div>"+
+          "<div class='info' data-item-edit role='button' tabindex='0'><div class='nm'>"+esc(it.name)+"</div>"+
           "<div class='sub'>"+r0(it.p*it.qty)+"P "+r0(it.c*it.qty)+"C "+r0(it.f*it.qty)+"F</div></div>"+
           "<div class='meal-kcol'><span class='knum'>"+r0(it.cal*it.qty)+"</span><span class='kunit'></span></div>"+
           "<div class='qty'><button class='qbtn' data-act='dec'>−</button>"+
@@ -2198,6 +2199,12 @@
     if(add){ openAdd(add.getAttribute("data-add")); return; }
     var toggle=e.target.closest("[data-toggle]");
     if(toggle){ var m=toggle.getAttribute("data-meal"); collapsed[m]=!collapsed[m]; renderMeals(); return; }
+    var info=e.target.closest("[data-item-edit]");
+    if(info){
+      var iEl=info.closest(".item");
+      var iMeal=iEl.closest(".meal").querySelector("[data-meal]").getAttribute("data-meal");
+      openEditLogItem(iMeal, iEl.getAttribute("data-id")); return;
+    }
     var q=e.target.closest(".qbtn");
     if(q){
       var itemEl=q.closest(".item"), id=itemEl.getAttribute("data-id");
@@ -2390,7 +2397,9 @@
   // edit food
   function openEdit(id){
     var f=foods.find(function(x){return x.id===id;}); if(!f) return;
-    editingId=id;
+    editingId=id; editLogRef=null;
+    document.getElementById("editTitle").textContent="Edit Food";
+    document.getElementById("deleteFood").textContent="Delete food";
     document.getElementById("efName").value=f.name;
     document.getElementById("efServing").value=f.serving||"";
     document.getElementById("efCal").value=f.cal;
@@ -2399,7 +2408,33 @@
     document.getElementById("efF").value=f.f;
     openSheet("editSheet");
   }
+  // edit a single logged item (correct a mis-entered custom entry). Values
+  // shown are per-serving; the logged quantity is kept as-is.
+  function openEditLogItem(meal, id){
+    var d=dayLog(), it=(d[meal]||[]).find(function(x){return x.id===id;}); if(!it) return;
+    editLogRef={meal:meal,id:id}; editingId=null;
+    document.getElementById("editTitle").textContent="Edit Item";
+    document.getElementById("deleteFood").textContent="Remove from log";
+    document.getElementById("efName").value=it.name;
+    document.getElementById("efServing").value=it.serving||"";
+    document.getElementById("efCal").value=it.cal;
+    document.getElementById("efP").value=it.p;
+    document.getElementById("efC").value=it.c;
+    document.getElementById("efF").value=it.f;
+    openSheet("editSheet");
+  }
   document.getElementById("saveEditFood").addEventListener("click",function(){
+    if(editLogRef){
+      var d=dayLog(), it=(d[editLogRef.meal]||[]).find(function(x){return x.id===editLogRef.id;});
+      if(!it){ closeSheets(); return; }
+      it.name=document.getElementById("efName").value.trim()||it.name;
+      it.serving=document.getElementById("efServing").value.trim();
+      it.cal=r0(num(document.getElementById("efCal").value));
+      it.p=r1(num(document.getElementById("efP").value));
+      it.c=r1(num(document.getElementById("efC").value));
+      it.f=r1(num(document.getElementById("efF").value));
+      saveLog(); renderAll(); closeSheets(); return;
+    }
     var f=foods.find(function(x){return x.id===editingId;}); if(!f) return;
     f.name=document.getElementById("efName").value.trim()||f.name;
     f.serving=document.getElementById("efServing").value.trim();
@@ -2410,6 +2445,11 @@
     saveFoods(); renderManage(); openSheet("manageSheet");
   });
   document.getElementById("deleteFood").addEventListener("click",function(){
+    if(editLogRef){
+      var d=dayLog(), arr=d[editLogRef.meal]||[], idx=arr.findIndex(function(x){return x.id===editLogRef.id;});
+      if(idx>=0) arr.splice(idx,1);
+      saveLog(); renderAll(); closeSheets(); return;
+    }
     foods=foods.filter(function(x){return x.id!==editingId;}); saveFoods(); renderManage(); openSheet("manageSheet");
   });
 
