@@ -602,6 +602,8 @@
   #tab-lift .wk-add:active{background:color-mix(in srgb,var(--protein) 10%,transparent)}
   #tab-lift .exc-rest{flex:none;width:36px;min-width:36px;height:24px;padding:0;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--blue);font-family:var(--ff-num);font-size:9.5px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   #tab-lift .exc-rest:active{background:color-mix(in srgb,var(--blue) 10%,transparent)}
+  #tab-lift .exc-mode{flex:none;min-width:38px;height:24px;padding:0 6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--ff-ui);font-size:9px;font-weight:700;letter-spacing:.06em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  #tab-lift .exc-mode:active{background:var(--surface-2)}
   #tab-lift .exc{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
   #tab-lift .exc-head{display:flex;align-items:center;gap:5px;padding:8px 10px}
   #tab-lift .exc-head .exc-title{flex:1;min-width:0;display:flex;align-items:center;gap:5px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -3538,9 +3540,18 @@
     return "Bands & other"; }
   var EX_ID={}; EX_DB.forEach(function(r){ if(!EX_ID[r[0]]) EX_ID[r[0]]=r[3]; });
   var EX_BW={}; EX_DB.forEach(function(r){ if(r[2]==="body weight") EX_BW[r[0]]=1; });
-  // time-based holds (log seconds) vs rep-based bodyweight moves (log reps, optional added weight)
-  function exIsDur(name){ return /plank|hold|carry|wall ?sit|dead ?hang|hang|bridge hold/i.test(name); }
+  // time-based holds (log seconds) vs rep-based bodyweight moves (log reps, optional added weight).
+  // \bhang\b matches "Dead Hang"/"Bar Hang" but not "Hanging Leg Raise" (a rep move).
+  function exIsDur(name){ return /plank|hold|carry|wall ?sit|\bhang\b/i.test(name); }
   function exIsBodyweight(name){ return !exIsDur(name) && !!EX_BW[name]; }
+  // Per-exercise logging-type override (persisted + synced), for when the
+  // auto-detection guesses wrong. Modes: 'std' (kg x reps), 'bw' (reps + optional
+  // added kg), 'time' (seconds).
+  var EXMODE_KEY="mt_ex_modes", EX_MODE={};
+  function saveExModes(){ sSet(EXMODE_KEY, JSON.stringify(EX_MODE)); }
+  function exModeFor(name){ if(EX_MODE[name]) return EX_MODE[name]; if(exIsDur(name)) return "time"; if(exIsBodyweight(name)) return "bw"; return "std"; }
+  function exModeFlags(name){ var m=exModeFor(name); return {dur:m==="time", bw:m==="bw"}; }
+  function exModeLabel(e){ return e.dur?"SEC":(e.bw?"BW":"WT"); }
   function exImg(name){ var f=EX_ID[name]; return f?("assets/exdb/images/"+f+".jpg"):""; }
   function exGif(name){ var f=EX_ID[name]; return f?("assets/exdb/gifs/"+f+".gif"):""; }
   function buildExLibrary(){
@@ -3631,6 +3642,7 @@
     var collapsed = isToday(wCurrent) ? !!collapsedExc[e.id] : !pastOpen[e.id];
     return "<div class='exc"+(collapsed?" collapsed":"")+"' data-ex='"+e.id+"'>"+
       "<div class='exc-head'><span class='exc-title' data-ex-collapse='"+e.id+"'><span class='exc-chev' aria-hidden='true'><svg viewBox='0 0 24 24'><polyline points='9 6 15 12 9 18'/></svg></span><span class='en'>"+esc(e.name)+"</span>"+lastLine+"</span>"+pbBadge+
+        "<button type='button' class='exc-mode' data-mode-cycle='"+e.id+"' aria-label='Change logging type' title='Logging type: tap to switch weights / bodyweight / time'>"+exModeLabel(e)+"</button>"+
         "<button type='button' class='exc-rest' data-rest-cycle aria-label='Rest timer length'>"+restDefault+"s</button>"+
         "<button class='set-add' data-add-set='"+e.id+"' aria-label='Add set'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12 6v12M6 12h12'/></svg></button>"+
         "<button class='exc-form' data-form='"+encodeURIComponent(e.name)+"' aria-label='Form review'><svg viewBox='0 0 24 24'><path d='M4 8.5A1.5 1.5 0 0 1 5.5 7h1.7l1-1.6A1.5 1.5 0 0 1 10.5 4.7h3a1.5 1.5 0 0 1 1.3.7l1 1.6h1.7A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5v-9Z'/><circle cx='12' cy='12.5' r='3.2'/></svg></button>"+
@@ -3775,7 +3787,7 @@
     requestAnimationFrame(function(){ toTop(); requestAnimationFrame(toTop); });
     setTimeout(toTop, 320);
   }
-  function addExercise(name){ if(!name) return; wSession().exercises.push({id:uid(),name:name,dur:exIsDur(name),bw:exIsBodyweight(name),sets:[{w:"",reps:"",done:false}]}); saveWorkouts(); renderWorkout(); }
+  function addExercise(name){ if(!name) return; var f=exModeFlags(name); wSession().exercises.push({id:uid(),name:name,dur:f.dur,bw:f.bw,sets:[{w:"",reps:"",done:false}]}); saveWorkouts(); renderWorkout(); }
 
   document.getElementById("wkList").addEventListener("click", function(e){
     var coll=e.target.closest("[data-ex-collapse]");
@@ -3793,6 +3805,18 @@
     if(spi){ var pp=planById(spi.getAttribute("data-start-plan-inline")); if(pp) applyPlan(pp); return; }
     if(e.target.closest("[data-save-plan]")){ saveSessionAsPlan(); return; }
     if(e.target.closest("[data-rest-cycle]")){ cycleRestDefault(); return; }
+    var mc=e.target.closest("[data-mode-cycle]");
+    if(mc){
+      var exm=exById(mc.getAttribute("data-mode-cycle"));
+      if(exm){
+        var order=["std","bw","time"], cur=exm.dur?"time":(exm.bw?"bw":"std");
+        var next=order[(order.indexOf(cur)+1)%order.length];
+        EX_MODE[exm.name]=next; saveExModes();
+        var f=exModeFlags(exm.name); exm.dur=f.dur; exm.bw=f.bw;
+        saveWorkouts(); renderWorkout();
+      }
+      return;
+    }
     var addS=e.target.closest("[data-add-set]");
     if(addS){ var ex=exById(addS.getAttribute("data-add-set")); if(ex){ var last=ex.sets[ex.sets.length-1]; ex.sets.push({w:last?last.w:"",reps:last?last.reps:"",done:false}); saveWorkouts(); renderWorkout(); } return; }
     var delS=e.target.closest("[data-del-set]");
@@ -4067,7 +4091,8 @@
     (plan.exercises||[]).forEach(function(pe){
       var n=Math.max(1, parseInt(pe.sets,10)||1), sets=[];
       for(var i=0;i<n;i++) sets.push({w:"", reps:(pe.reps!==""&&pe.reps!=null)?pe.reps:"", done:false});
-      sess.exercises.push({id:uid(), name:pe.name, note:"", dur:exIsDur(pe.name), bw:exIsBodyweight(pe.name), sets:sets, fromPlan:plan.name});
+      var pf=exModeFlags(pe.name);
+      sess.exercises.push({id:uid(), name:pe.name, note:"", dur:pf.dur, bw:pf.bw, sets:sets, fromPlan:plan.name});
     });
     saveWorkouts(); renderWorkout();
   }
@@ -4257,7 +4282,7 @@
   function lastWorkoutBefore(beforeKey){ var ds=wDatesWith().filter(function(k){return k<beforeKey;}); return ds.length?ds[ds.length-1]:null; }
   function repeatWorkout(fromKey){
     var src=workouts[fromKey]; if(!src||!src.exercises) return;
-    wSession().exercises = src.exercises.map(function(e){ return {id:uid(), name:e.name, note:e.note||"", dur:e.dur||exIsDur(e.name), bw:(typeof e.bw==="boolean"?e.bw:exIsBodyweight(e.name)), sets:(e.sets||[]).map(function(s){ return {w:s.w,reps:s.reps,done:false}; })}; });
+    wSession().exercises = src.exercises.map(function(e){ var rf=exModeFlags(e.name); return {id:uid(), name:e.name, note:e.note||"", dur:rf.dur, bw:rf.bw, sets:(e.sets||[]).map(function(s){ return {w:s.w,reps:s.reps,done:false}; })}; });
     saveWorkouts(); renderWorkout();
   }
 
@@ -5001,6 +5026,7 @@
     var plRaw=await sGet(PLANS_KEY); if(plRaw){ try{ plans=JSON.parse(plRaw)||[]; }catch(e){ plans=[]; } } else { seedPlans(); }
     var exrRaw=await sGet(EXRENAMES_KEY); if(exrRaw){ try{ EX_RENAMES=JSON.parse(exrRaw)||{}; }catch(e){ EX_RENAMES={}; } }
     var exfRaw=await sGet(EXFAV_KEY); if(exfRaw){ try{ EX_FAV=JSON.parse(exfRaw)||{}; }catch(e){ EX_FAV={}; } }
+    var exmRaw=await sGet(EXMODE_KEY); if(exmRaw){ try{ EX_MODE=JSON.parse(exmRaw)||{}; }catch(e){ EX_MODE={}; } }
     var rRaw=await sGet(REST_KEY); if(rRaw){ var rv=parseInt(rRaw,10); if(isFinite(rv)&&rv>0) restDefault=rv; }
     var wtRaw=await sGet(WATER_KEY); if(wtRaw){ try{ water=JSON.parse(wtRaw)||{}; }catch(e){ water={}; } }
     var jRaw=await sGet(JOURNAL_KEY); if(jRaw){ try{ journal=JSON.parse(jRaw)||{}; }catch(e){ journal={}; } }
