@@ -361,6 +361,7 @@
   .nf-name-grid .nf-top-opt .app-check svg{width:12px;height:12px}
   .field:has(#nfSaveToList:checked) .nf-save-lbl{color:var(--text)}
   #editSheet .ef-name-field{--nf-field-h:48px}
+  #editSheet .grid4{margin-bottom:14px}
   #editSheet .nf-name-grid > label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;line-height:1.2;margin:0}
   #editSheet .field:has(#efSaveToList:checked) .nf-save-lbl{color:var(--text)}
   #editSheet .nf-name-grid.no-save{grid-template-columns:minmax(0,1fr)}
@@ -1464,8 +1465,14 @@
           <div class="field"><label>F</label><input type="number" inputmode="decimal" id="nfF" placeholder="0"></div>
         </div>
         <div class="field nf-amount">
-          <label>Quantity</label>
-          <input type="number" inputmode="decimal" id="nfAmount" min="0" step="any" value="1">
+          <label>Amount to log</label>
+          <div class="nf-amount-row">
+            <input type="number" inputmode="decimal" id="nfAmount" min="0" step="any" value="1">
+            <div class="nf-unit" role="group" aria-label="Amount unit">
+              <button type="button" id="nfUnitG" data-unit="g">grams</button>
+              <button type="button" id="nfUnitServ" data-unit="serv" class="on">servings</button>
+            </div>
+          </div>
           <div class="nf-amount-hint" id="nfAmountHint"></div>
         </div>
         <button class="primary" id="saveNewFood">Add to meal</button>
@@ -2278,7 +2285,7 @@
   document.getElementById("saveNewFood").addEventListener("click",function(){
     var name=document.getElementById("nfName").value.trim();
     if(!name){ document.getElementById("nfName").focus(); return; }
-    var food={id:uid(),name:name,serving:"",servingG:0,
+    var food={id:uid(),name:name,serving:"",servingG:nfServingG||0,
       cal:r0(num(document.getElementById("nfCal").value)),
       p:r1(num(document.getElementById("nfP").value)),
       c:r1(num(document.getElementById("nfC").value)),
@@ -2518,19 +2525,47 @@
     }
   }
   /* ---- amount to log: grams <-> servings, scaling the per-serving macros ---- */
-  function nfAmountQty(){                 // -> quantity (number of entries) to log
+  var nfServingG=0, nfUnit="serv";
+  function parseServingGrams(txt){
+    if(!txt) return 0;
+    var m=String(txt).match(/(\d+(?:\.\d+)?)\s*g\b/i);
+    return m ? num(m[1]) : 0;
+  }
+  function nfAmountQty(){                 // -> number of servings to log
     var v=num(document.getElementById("nfAmount").value);
-    return v>0 ? v : 1;
+    if(v<=0) return nfUnit==="serv" ? 1 : 0;
+    return nfUnit==="g" ? (nfServingG>0 ? v/nfServingG : 0) : v;
   }
   function updateAmountHint(){
     var hint=document.getElementById("nfAmountHint"); if(!hint) return;
     var qty=nfAmountQty();
+    if(!(qty>0)){ hint.textContent=""; return; }
     var cal=num(document.getElementById("nfCal").value);
-    hint.textContent = cal>0 ? ("= "+r0(cal*qty)+" kcal") : "";
+    hint.textContent="= "+r1(qty)+" serving"+(qty===1?"":"s")+(cal>0?" · "+r0(cal*qty)+" kcal":"");
   }
-  function configureAmount(){              // reset the quantity when the form is filled or opened
-    document.getElementById("nfAmount").value="1";
+  function setNfUnit(unit){
+    if(unit==="g" && !(nfServingG>0)) unit="serv";
+    var inp=document.getElementById("nfAmount"), cur=num(inp.value);
+    if(unit!==nfUnit && nfServingG>0 && cur>0){   // keep the real amount the same across the toggle
+      if(unit==="g") inp.value=r1(cur*nfServingG);
+      else inp.value=r1(cur/nfServingG);
+    }
+    nfUnit=unit;
+    document.getElementById("nfUnitG").classList.toggle("on",unit==="g");
+    document.getElementById("nfUnitServ").classList.toggle("on",unit==="serv");
     updateAmountHint();
+  }
+  function refreshGramsAvail(){
+    var gBtn=document.getElementById("nfUnitG");
+    gBtn.disabled=!(nfServingG>0);
+    gBtn.title=nfServingG>0?("1 serving = "+r1(nfServingG)+" g"):"serving weight unknown";
+    if(nfServingG===0 && nfUnit==="g") setNfUnit("serv");
+  }
+  function configureAmount(servingG){      // called when a food is filled or the form is reset
+    nfServingG=servingG>0?servingG:0;
+    document.getElementById("nfAmount").value="1";
+    refreshGramsAvail();
+    setNfUnit("serv");
   }
   function fillNewFood(o){
     if(o.name!=null) document.getElementById("nfName").value=o.name;
@@ -2538,9 +2573,13 @@
     document.getElementById("nfP").value=(o.p!=null&&isFinite(o.p))?r1(o.p):"";
     document.getElementById("nfC").value=(o.c!=null&&isFinite(o.c))?r1(o.c):"";
     document.getElementById("nfF").value=(o.f!=null&&isFinite(o.f))?r1(o.f):"";
-    configureAmount();
+    // AI scan supplies the gram basis (o.servingG) or a serving like "60 g",
+    // which enables the grams option even though there is no serving field.
+    configureAmount((o.servingG&&o.servingG>0)?o.servingG:parseServingGrams(o.serving));
     showManualForm(true, {toEnd:true});
   }
+  document.getElementById("nfUnitG").addEventListener("click",function(){ setNfUnit("g"); });
+  document.getElementById("nfUnitServ").addEventListener("click",function(){ setNfUnit("serv"); });
   document.getElementById("nfAmount").addEventListener("input",updateAmountHint);
   document.getElementById("nfCal").addEventListener("input",updateAmountHint);
   document.getElementById("mManual").addEventListener("click", function(){
