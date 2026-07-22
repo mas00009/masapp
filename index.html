@@ -4998,6 +4998,45 @@
   }catch(e){}
 })();
 
+/* Swipe left/right on a day-based tab to step forward/back through days
+   (or weeks on the calendar). Reuses the existing prev/next buttons so all
+   their guards (no future gym day, etc.) are respected. */
+(function(){
+  var TAB_NAV={ food:["prevDay","nextDay"], supps:["suppPrevDay","suppNextDay"], lift:["wkPrev","wkNext"], plan:["planPrev","planNext"] };
+  var sx=0, sy=0, st=0, tracking=false, startEl=null;
+  function activeTab(){ var b=document.querySelector(".tabbtn.active"); return b?b.getAttribute("data-tab"):null; }
+  function blocked(){
+    if(document.querySelector(".sheet.open")) return true;
+    var bd=document.getElementById("backdrop"); if(bd && bd.classList.contains("open")) return true;
+    var rb=document.getElementById("restBar"); if(rb && !rb.hidden) return true;
+    return false;
+  }
+  function inHScroll(el){
+    while(el && el.nodeType===1 && el!==document.body){
+      if(el.scrollWidth - el.clientWidth > 8){ var ov=getComputedStyle(el).overflowX; if(ov==="auto"||ov==="scroll") return true; }
+      el=el.parentElement;
+    }
+    return false;
+  }
+  document.addEventListener("touchstart", function(e){
+    if(!e.touches || e.touches.length!==1){ tracking=false; return; }
+    var t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); startEl=e.target; tracking=true;
+  }, {passive:true});
+  document.addEventListener("touchcancel", function(){ tracking=false; }, {passive:true});
+  document.addEventListener("touchend", function(e){
+    if(!tracking) return; tracking=false;
+    var t=e.changedTouches && e.changedTouches[0]; if(!t) return;
+    var dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Date.now()-st>600) return;
+    if(Math.abs(dx)<70) return;
+    if(Math.abs(dx) < Math.abs(dy)*1.7) return;   // too vertical, treat as scroll
+    if(blocked() || inHScroll(startEl)) return;
+    var tab=activeTab(), nav=tab&&TAB_NAV[tab]; if(!nav) return;
+    var btn=document.getElementById(dx<0 ? nav[1] : nav[0]);   // swipe left = forward, right = back
+    if(btn && !btn.disabled) btn.click();
+  }, {passive:true});
+})();
+
 /* The Stack: data-driven daily supplement checklist + editor */
 (function(){
   var scope=document.getElementById('tab-supps');
