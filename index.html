@@ -290,7 +290,8 @@
   .food .mg{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);display:grid;place-items:center;cursor:pointer;font-size:14px}
   .added-flash{color:var(--ok);font-family:var(--ff-num);font-size:11px}
 
-  .newfood{border-top:1px solid var(--border);margin-top:6px;padding-top:12px}
+  .newfood{margin-top:0;padding-top:2px}
+  .subhead.nf-list-head{border-top:1px solid var(--border);margin-top:14px;padding-top:14px}
   .field{margin:0 4px 10px}
   .field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:600}
   .field input{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:11px;padding:11px 13px;font-family:var(--ff-ui);font-size:16px;outline:none}
@@ -1437,7 +1438,6 @@
     <div class="photo-tray-status" id="photoStatus"></div>
   </div>
   <div class="sheet-body">
-    <div id="foodList"></div>
     <div class="newfood">
       <div class="subhead">Add New Food</div>
       <div class="methods">
@@ -1478,6 +1478,8 @@
         <button class="primary" id="saveNewFood">Add to meal</button>
       </div>
     </div>
+    <div class="subhead nf-list-head">Your foods</div>
+    <div id="foodList"></div>
   </div>
 </div>
 
@@ -2508,17 +2510,14 @@
     if(btn) btn.classList.toggle("on", !!show);
     if(show){
       setTimeout(function(){
-        if(opts.toEnd){
-          // AI filled the form: scroll the sheet to the bottom so the
-          // "Add to meal" button is visible; don't pop the keyboard
-          var sb=document.querySelector("#addSheet .sheet-body");
-          if(sb){
-            var toBottom=function(){ sb.scrollTop=sb.scrollHeight; };
-            toBottom();                                   // instant, reliable
-            requestAnimationFrame(function(){ toBottom(); requestAnimationFrame(toBottom); });
-          } else if(box) box.scrollIntoView({behavior:"smooth",block:"nearest"});
-        } else {
-          if(box) box.scrollIntoView({behavior:"smooth",block:"nearest"});
+        // The Add New Food form sits near the top of the sheet (above the
+        // food list), so scroll the sheet to the top to reveal it.
+        var sb=document.querySelector("#addSheet .sheet-body");
+        var toTop=function(){ if(sb) sb.scrollTop=0; };
+        toTop();
+        requestAnimationFrame(function(){ toTop(); requestAnimationFrame(toTop); });
+        if(!opts.toEnd){
+          // Manual entry (not an AI fill): focus the name for typing.
           var n=document.getElementById("nfName"); if(n) n.focus();
         }
       }, 80);
