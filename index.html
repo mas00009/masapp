@@ -360,9 +360,11 @@
   .nf-name-grid .nf-top-opt .app-check{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);margin:0;width:20px;height:20px;border-radius:6px}
   .nf-name-grid .nf-top-opt .app-check svg{width:12px;height:12px}
   .field:has(#nfSaveToList:checked) .nf-save-lbl{color:var(--text)}
-  #editSheet .ef-savewrap{align-items:center;gap:10px;margin:2px 2px 12px;cursor:pointer;font-size:14px;color:var(--muted);user-select:none;-webkit-tap-highlight-color:transparent}
-  #editSheet .ef-savewrap input{width:18px;height:18px;flex:none;accent-color:var(--blue)}
-  #editSheet .ef-savewrap:has(input:checked){color:var(--text)}
+  #editSheet .ef-name-field{--nf-field-h:48px}
+  #editSheet .nf-name-grid > label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;line-height:1.2;margin:0}
+  #editSheet .field:has(#efSaveToList:checked) .nf-save-lbl{color:var(--text)}
+  #editSheet .nf-name-grid.no-save{grid-template-columns:minmax(0,1fr)}
+  #editSheet .nf-name-grid.no-save .nf-save-lbl,#editSheet .nf-name-grid.no-save .nf-top-opt{display:none}
   .nf-top-opt{display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;border-radius:11px;border:1px solid var(--border);background:var(--surface-2);transition:border-color .2s,background .2s}
   .nf-top-opt:active{background:var(--border)}
   .nf-top-opt input{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
@@ -1637,7 +1639,17 @@
     <button class="close" data-close>Cancel</button>
   </div>
   <div class="sheet-body">
-    <div class="field"><label>Name</label><input type="text" id="efName"></div>
+    <div class="field ef-name-field">
+      <div class="nf-name-grid" id="efNameGrid">
+        <label for="efName" class="nf-name-lbl">Name</label>
+        <label class="nf-save-lbl" for="efSaveToList">Save</label>
+        <input type="text" id="efName">
+        <label class="nf-top-opt" for="efSaveToList">
+          <input type="checkbox" id="efSaveToList">
+          <span class="app-check" aria-hidden="true"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></span>
+        </label>
+      </div>
+    </div>
     <div class="field"><label>Serving</label><input type="text" id="efServing"></div>
     <div class="grid4">
       <div class="field"><label>Kcal</label><input type="number" inputmode="numeric" id="efCal"></div>
@@ -1645,7 +1657,6 @@
       <div class="field"><label>C</label><input type="number" inputmode="decimal" id="efC"></div>
       <div class="field"><label>F</label><input type="number" inputmode="decimal" id="efF"></div>
     </div>
-    <label class="ef-savewrap" id="efSaveWrap" style="display:none"><input type="checkbox" id="efSaveToList"><span>Save this to my foods</span></label>
     <button class="primary" id="saveEditFood">Save changes</button>
     <button class="ghost" id="deleteFood" style="color:var(--danger)">Delete food</button>
   </div>
@@ -2433,7 +2444,8 @@
     document.getElementById("efP").value=f.p;
     document.getElementById("efC").value=f.c;
     document.getElementById("efF").value=f.f;
-    var sw=document.getElementById("efSaveWrap"); if(sw) sw.style.display="none";
+    var grid=document.getElementById("efNameGrid"); if(grid) grid.classList.add("no-save");
+    var scb=document.getElementById("efSaveToList"); if(scb) scb.checked=false;
     openSheet("editSheet");
   }
   // edit a single logged item (correct a mis-entered custom entry). Values
@@ -2452,9 +2464,9 @@
     // Offer "save to my foods" only when this logged item isn't already a
     // saved food (i.e. it was entered manually).
     var already=!!(it.foodId && foods.some(function(x){return x.id===it.foodId;}));
-    var sw=document.getElementById("efSaveWrap"), scb=document.getElementById("efSaveToList");
+    var grid=document.getElementById("efNameGrid"), scb=document.getElementById("efSaveToList");
     if(scb) scb.checked=false;
-    if(sw) sw.style.display = already ? "none" : "flex";
+    if(grid) grid.classList.toggle("no-save", already);
     openSheet("editSheet");
   }
   document.getElementById("saveEditFood").addEventListener("click",function(){
