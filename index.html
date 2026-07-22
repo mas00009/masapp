@@ -360,6 +360,9 @@
   .nf-name-grid .nf-top-opt .app-check{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);margin:0;width:20px;height:20px;border-radius:6px}
   .nf-name-grid .nf-top-opt .app-check svg{width:12px;height:12px}
   .field:has(#nfSaveToList:checked) .nf-save-lbl{color:var(--text)}
+  #editSheet .ef-savewrap{align-items:center;gap:10px;margin:2px 2px 12px;cursor:pointer;font-size:14px;color:var(--muted);user-select:none;-webkit-tap-highlight-color:transparent}
+  #editSheet .ef-savewrap input{width:18px;height:18px;flex:none;accent-color:var(--blue)}
+  #editSheet .ef-savewrap:has(input:checked){color:var(--text)}
   .nf-top-opt{display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;border-radius:11px;border:1px solid var(--border);background:var(--surface-2);transition:border-color .2s,background .2s}
   .nf-top-opt:active{background:var(--border)}
   .nf-top-opt input{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
@@ -1644,6 +1647,7 @@
       <div class="field"><label>C</label><input type="number" inputmode="decimal" id="efC"></div>
       <div class="field"><label>F</label><input type="number" inputmode="decimal" id="efF"></div>
     </div>
+    <label class="ef-savewrap" id="efSaveWrap" style="display:none"><input type="checkbox" id="efSaveToList"><span>Save this to my foods</span></label>
     <button class="primary" id="saveEditFood">Save changes</button>
     <button class="ghost" id="deleteFood" style="color:var(--danger)">Delete food</button>
   </div>
@@ -2431,6 +2435,7 @@
     document.getElementById("efP").value=f.p;
     document.getElementById("efC").value=f.c;
     document.getElementById("efF").value=f.f;
+    var sw=document.getElementById("efSaveWrap"); if(sw) sw.style.display="none";
     openSheet("editSheet");
   }
   // edit a single logged item (correct a mis-entered custom entry). Values
@@ -2446,6 +2451,12 @@
     document.getElementById("efP").value=it.p;
     document.getElementById("efC").value=it.c;
     document.getElementById("efF").value=it.f;
+    // Offer "save to my foods" only when this logged item isn't already a
+    // saved food (i.e. it was entered manually).
+    var already=!!(it.foodId && foods.some(function(x){return x.id===it.foodId;}));
+    var sw=document.getElementById("efSaveWrap"), scb=document.getElementById("efSaveToList");
+    if(scb) scb.checked=false;
+    if(sw) sw.style.display = already ? "none" : "flex";
     openSheet("editSheet");
   }
   document.getElementById("saveEditFood").addEventListener("click",function(){
@@ -2458,6 +2469,11 @@
       it.p=r1(num(document.getElementById("efP").value));
       it.c=r1(num(document.getElementById("efC").value));
       it.f=r1(num(document.getElementById("efF").value));
+      var scb=document.getElementById("efSaveToList");
+      if(scb && scb.checked){
+        var nf={id:uid(),name:it.name,serving:it.serving||"",servingG:it.servingG||0,cal:it.cal,p:it.p,c:it.c,f:it.f};
+        foods.unshift(nf); it.foodId=nf.id; saveFoods();
+      }
       saveLog(); renderAll(); closeSheets(); return;
     }
     var f=foods.find(function(x){return x.id===editingId;}); if(!f) return;
