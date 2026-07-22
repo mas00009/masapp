@@ -1457,7 +1457,6 @@
             </label>
           </div>
         </div>
-        <div class="field"><label>Serving</label><input type="text" id="nfServing" placeholder="e.g. 100g, 1 tub, 1 shake"></div>
         <div class="grid4">
           <div class="field"><label>Kcal</label><input type="number" inputmode="numeric" id="nfCal" placeholder="0"></div>
           <div class="field"><label>P</label><input type="number" inputmode="decimal" id="nfP" placeholder="0"></div>
@@ -1465,14 +1464,8 @@
           <div class="field"><label>F</label><input type="number" inputmode="decimal" id="nfF" placeholder="0"></div>
         </div>
         <div class="field nf-amount">
-          <label>Amount to log</label>
-          <div class="nf-amount-row">
-            <input type="number" inputmode="decimal" id="nfAmount" min="0" step="any" value="1">
-            <div class="nf-unit" role="group" aria-label="Amount unit">
-              <button type="button" id="nfUnitG" data-unit="g">grams</button>
-              <button type="button" id="nfUnitServ" data-unit="serv" class="on">servings</button>
-            </div>
-          </div>
+          <label>Quantity</label>
+          <input type="number" inputmode="decimal" id="nfAmount" min="0" step="any" value="1">
           <div class="nf-amount-hint" id="nfAmountHint"></div>
         </div>
         <button class="primary" id="saveNewFood">Add to meal</button>
@@ -1650,7 +1643,6 @@
         </label>
       </div>
     </div>
-    <div class="field"><label>Serving</label><input type="text" id="efServing"></div>
     <div class="grid4">
       <div class="field"><label>Kcal</label><input type="number" inputmode="numeric" id="efCal"></div>
       <div class="field"><label>P</label><input type="number" inputmode="decimal" id="efP"></div>
@@ -2262,7 +2254,7 @@
     document.getElementById("foodSearch").value="";
     setStatus("");
     showManualForm(false);
-    configureAmount(0);
+    configureAmount();
     photoQueue=[]; renderPhotoTray();
     var saveCb=document.getElementById("nfSaveToList");
     if(saveCb) saveCb.checked=!!opts.saveToList;
@@ -2286,7 +2278,7 @@
   document.getElementById("saveNewFood").addEventListener("click",function(){
     var name=document.getElementById("nfName").value.trim();
     if(!name){ document.getElementById("nfName").focus(); return; }
-    var food={id:uid(),name:name,serving:document.getElementById("nfServing").value.trim(),servingG:nfServingG||0,
+    var food={id:uid(),name:name,serving:"",servingG:0,
       cal:r0(num(document.getElementById("nfCal").value)),
       p:r1(num(document.getElementById("nfP").value)),
       c:r1(num(document.getElementById("nfC").value)),
@@ -2294,9 +2286,9 @@
     var qty=nfAmountQty(); if(!(qty>0)) qty=1;
     var saveCb=document.getElementById("nfSaveToList");
     if(saveCb && saveCb.checked){ foods.unshift(food); saveFoods(); }
-    ["nfName","nfServing","nfCal","nfP","nfC","nfF"].forEach(function(i){ document.getElementById(i).value=""; });
+    ["nfName","nfCal","nfP","nfC","nfF"].forEach(function(i){ document.getElementById(i).value=""; });
     if(saveCb) saveCb.checked=false;
-    configureAmount(0);
+    configureAmount();
     if(document.getElementById("addSheet").classList.contains("open")){ addToMeal(food, qty); closeSheets(); }
     else{ renderManage(); }
   });
@@ -2439,7 +2431,6 @@
     document.getElementById("editTitle").textContent="Edit Food";
     document.getElementById("deleteFood").textContent="Delete food";
     document.getElementById("efName").value=f.name;
-    document.getElementById("efServing").value=f.serving||"";
     document.getElementById("efCal").value=f.cal;
     document.getElementById("efP").value=f.p;
     document.getElementById("efC").value=f.c;
@@ -2456,7 +2447,6 @@
     document.getElementById("editTitle").textContent="Edit Item";
     document.getElementById("deleteFood").textContent="Remove from log";
     document.getElementById("efName").value=it.name;
-    document.getElementById("efServing").value=it.serving||"";
     document.getElementById("efCal").value=it.cal;
     document.getElementById("efP").value=it.p;
     document.getElementById("efC").value=it.c;
@@ -2474,7 +2464,6 @@
       var d=dayLog(), it=(d[editLogRef.meal]||[]).find(function(x){return x.id===editLogRef.id;});
       if(!it){ closeSheets(); return; }
       it.name=document.getElementById("efName").value.trim()||it.name;
-      it.serving=document.getElementById("efServing").value.trim();
       it.cal=r0(num(document.getElementById("efCal").value));
       it.p=r1(num(document.getElementById("efP").value));
       it.c=r1(num(document.getElementById("efC").value));
@@ -2488,7 +2477,6 @@
     }
     var f=foods.find(function(x){return x.id===editingId;}); if(!f) return;
     f.name=document.getElementById("efName").value.trim()||f.name;
-    f.serving=document.getElementById("efServing").value.trim();
     f.cal=r0(num(document.getElementById("efCal").value));
     f.p=r1(num(document.getElementById("efP").value));
     f.c=r1(num(document.getElementById("efC").value));
@@ -2530,66 +2518,31 @@
     }
   }
   /* ---- amount to log: grams <-> servings, scaling the per-serving macros ---- */
-  var nfServingG=0, nfUnit="serv";
-  function parseServingGrams(txt){
-    if(!txt) return 0;
-    var m=String(txt).match(/(\d+(?:\.\d+)?)\s*g\b/i);
-    return m ? num(m[1]) : 0;
-  }
-  function nfAmountQty(){                 // -> number of servings to log
+  function nfAmountQty(){                 // -> quantity (number of entries) to log
     var v=num(document.getElementById("nfAmount").value);
-    if(v<=0) return nfUnit==="serv" ? 1 : 0;
-    return nfUnit==="g" ? (nfServingG>0 ? v/nfServingG : 0) : v;
+    return v>0 ? v : 1;
   }
   function updateAmountHint(){
     var hint=document.getElementById("nfAmountHint"); if(!hint) return;
     var qty=nfAmountQty();
-    if(!(qty>0)){ hint.textContent=""; return; }
     var cal=num(document.getElementById("nfCal").value);
-    hint.textContent="= "+r1(qty)+" serving"+(qty===1?"":"s")+(cal>0?" · "+r0(cal*qty)+" kcal":"");
+    hint.textContent = cal>0 ? ("= "+r0(cal*qty)+" kcal") : "";
   }
-  function setNfUnit(unit){
-    if(unit==="g" && !(nfServingG>0)) unit="serv";
-    var inp=document.getElementById("nfAmount"), cur=num(inp.value);
-    if(unit!==nfUnit && nfServingG>0 && cur>0){   // keep the real amount the same across the toggle
-      if(unit==="g") inp.value=r1(cur*nfServingG);
-      else inp.value=r1(cur/nfServingG);
-    }
-    nfUnit=unit;
-    document.getElementById("nfUnitG").classList.toggle("on",unit==="g");
-    document.getElementById("nfUnitServ").classList.toggle("on",unit==="serv");
-    updateAmountHint();
-  }
-  function refreshGramsAvail(){
-    var gBtn=document.getElementById("nfUnitG");
-    gBtn.disabled=!(nfServingG>0);
-    gBtn.title=nfServingG>0?("1 serving = "+r1(nfServingG)+" g"):"serving weight unknown";
-    if(nfServingG===0 && nfUnit==="g") setNfUnit("serv");
-  }
-  function configureAmount(servingG){      // called when a food is filled or the form is reset
-    nfServingG=servingG>0?servingG:0;
+  function configureAmount(){              // reset the quantity when the form is filled or opened
     document.getElementById("nfAmount").value="1";
-    refreshGramsAvail();
-    setNfUnit("serv");
+    updateAmountHint();
   }
   function fillNewFood(o){
     if(o.name!=null) document.getElementById("nfName").value=o.name;
-    if(o.serving!=null) document.getElementById("nfServing").value=o.serving;
     document.getElementById("nfCal").value=(o.cal!=null&&isFinite(o.cal))?r0(o.cal):"";
     document.getElementById("nfP").value=(o.p!=null&&isFinite(o.p))?r1(o.p):"";
     document.getElementById("nfC").value=(o.c!=null&&isFinite(o.c))?r1(o.c):"";
     document.getElementById("nfF").value=(o.f!=null&&isFinite(o.f))?r1(o.f):"";
-    configureAmount((o.servingG&&o.servingG>0)?o.servingG:parseServingGrams(o.serving));
+    configureAmount();
     showManualForm(true, {toEnd:true});
   }
-  document.getElementById("nfUnitG").addEventListener("click",function(){ setNfUnit("g"); });
-  document.getElementById("nfUnitServ").addEventListener("click",function(){ setNfUnit("serv"); });
   document.getElementById("nfAmount").addEventListener("input",updateAmountHint);
   document.getElementById("nfCal").addEventListener("input",updateAmountHint);
-  document.getElementById("nfServing").addEventListener("input",function(){
-    nfServingG=parseServingGrams(this.value);   // let a typed "100g" enable grams mode
-    refreshGramsAvail(); updateAmountHint();
-  });
   document.getElementById("mManual").addEventListener("click", function(){
     var box=document.getElementById("nfManual");
     showManualForm(box && box.hidden, {toEnd:true});
@@ -3739,6 +3692,16 @@
     if(er.bottom > lr.bottom - pad) list.scrollTop += er.bottom - lr.bottom + pad;
     if(er.top < lr.top + pad) list.scrollTop -= lr.top - er.top + pad;
   }
+  // Bring an element's TOP near the top of the list. Used when expanding a
+  // group or sub-section so its first items are shown, not its bottom (a tall
+  // section would otherwise get scrolled to its end).
+  function scrollExListTop(el, pad){
+    var list=document.getElementById("exList");
+    if(!list||!el) return;
+    pad=pad||8;
+    var er=el.getBoundingClientRect(), lr=list.getBoundingClientRect();
+    list.scrollTop += (er.top - lr.top) - pad;
+  }
   function openExercisePicker(){
     exGroupOpen={}; exSecOpen={};
     document.getElementById("exSearch").value="";
@@ -3886,7 +3849,7 @@
       exGroupOpen={}; exSecOpen={};
       if(!wasOpen) exGroupOpen[g]=true;
       renderExList(document.getElementById("exSearch").value);
-      if(!wasOpen){ var grp=gh.closest(".ex-grp"); if(grp) setTimeout(function(){ scrollExListToEl(grp, 10); }, 40); }
+      if(!wasOpen){ var grp=gh.closest(".ex-grp"); if(grp) setTimeout(function(){ scrollExListTop(grp, 10); }, 40); }
       return;
     }
     var sh=e.target.closest("[data-exsec]");
@@ -3894,7 +3857,7 @@
       var sk=sh.getAttribute("data-exsec"), sWas=!!exSecOpen[sk];
       if(sWas) delete exSecOpen[sk]; else exSecOpen[sk]=true;
       renderExList(document.getElementById("exSearch").value);
-      if(!sWas){ setTimeout(function(){ var el=document.querySelector('.ex-sec-h[data-exsec="'+CSS.escape(sk)+'"]'); if(el) scrollExListToEl(el.closest(".ex-sec")||el, 10); }, 40); }
+      if(!sWas){ setTimeout(function(){ var el=document.querySelector('.ex-sec-h[data-exsec="'+CSS.escape(sk)+'"]'); if(el) scrollExListTop(el, 10); }, 40); }
       return;
     }
     var star=e.target.closest("[data-ex-fav]");
