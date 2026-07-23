@@ -302,6 +302,18 @@
   .field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:600}
   .field input{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:11px;padding:11px 13px;font-family:var(--ff-ui);font-size:16px;outline:none}
   .field input:focus{border-color:var(--protein)}
+  .sch-title-wrap{position:relative}
+  .sch-title-wrap>input{width:100%;box-sizing:border-box;padding-right:40px}
+  .sch-title-caret{position:absolute;top:0;right:0;height:100%;width:40px;display:grid;place-items:center;background:none;border:none;color:var(--muted);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+  .sch-title-caret svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .sch-title-drop{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:30;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:5px;max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+  .sch-title-drop[hidden]{display:none}
+  .sch-title-opt{display:flex;align-items:center;gap:6px;border-radius:8px}
+  .sch-title-opt:active{background:var(--surface)}
+  .sch-title-opt .stt-name{flex:1;min-width:0;padding:10px 10px;font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+  .sch-title-opt .stt-del{flex:none;width:32px;height:36px;background:none;border:none;color:var(--faint);font-size:17px;line-height:1;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+  .sch-title-opt .stt-del:active{color:var(--danger)}
+  .sch-title-empty{padding:10px;font-size:12.5px;color:var(--faint);text-align:center}
   .time-field{position:relative}
   .time-field-box{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:11px 13px;cursor:pointer;font:inherit;color:inherit;text-align:left;-webkit-tap-highlight-color:transparent}
   .time-field.open .time-field-box{border-color:color-mix(in srgb,var(--protein) 45%,var(--border))}
@@ -1724,7 +1736,13 @@
       <option value="gym">Gym</option><option value="basketball">Basketball</option>
       <option value="swimming">Swimming</option>
     </select></div>
-    <div class="field"><label>Title</label><input type="text" id="schTitleInput"></div>
+    <div class="field"><label>Title</label>
+      <div class="sch-title-wrap">
+        <input type="text" id="schTitleInput" autocomplete="off">
+        <button type="button" class="sch-title-caret" id="schTitleCaret" aria-label="Show saved titles"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="sch-title-drop" id="schTitleDrop" hidden></div>
+      </div>
+    </div>
     <div class="field"><label>Time</label>
       <div class="time-field" id="schTimeField">
         <button type="button" class="time-field-box" id="schTimeTap" aria-expanded="false">
@@ -3197,6 +3215,19 @@
 
   /* ---------- schedule / plan ---------- */
   var SCHED_KEY="mt_schedule", schedule=[], editSchedId=null, planWeekOffset=0, planDayOpen={};
+  var SCHTITLES_KEY="mt_sched_titles", schedTitles=[];
+  function saveSchedTitles(){ sSet(SCHTITLES_KEY, JSON.stringify(schedTitles)); }
+  function addSchedTitle(t){ t=(t||"").trim(); if(!t) return; schedTitles=schedTitles.filter(function(x){return x.toLowerCase()!==t.toLowerCase();}); schedTitles.unshift(t); if(schedTitles.length>40) schedTitles=schedTitles.slice(0,40); saveSchedTitles(); }
+  function removeSchedTitle(t){ schedTitles=schedTitles.filter(function(x){return x!==t;}); saveSchedTitles(); renderSchedTitleDrop(); }
+  function renderSchedTitleDrop(){
+    var drop=document.getElementById("schTitleDrop"); if(!drop) return;
+    var q=(document.getElementById("schTitleInput").value||"").trim().toLowerCase();
+    var list=schedTitles.filter(function(t){ return !q || t.toLowerCase().indexOf(q)>=0; });
+    drop.innerHTML = list.length
+      ? list.map(function(t){ return "<div class='sch-title-opt'><span class='stt-name' data-title=\""+esc(t)+"\">"+esc(t)+"</span><button type='button' class='stt-del' data-title-del=\""+esc(t)+"\" aria-label='Remove saved title'>×</button></div>"; }).join("")
+      : "<div class='sch-title-empty'>"+(schedTitles.length?"No matches":"No saved titles yet")+"</div>";
+  }
+  function showSchedTitleDrop(show){ var d=document.getElementById("schTitleDrop"); if(!d) return; if(show){ renderSchedTitleDrop(); d.hidden=false; } else { d.hidden=true; } }
   var DAYS_FULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   var DAYS_SHORT=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   var MON_SHORT=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
@@ -3502,6 +3533,7 @@
     document.getElementById("schDelete").style.display = s ? "block" : "none";
     toggleSchGymBits();
     updateSchDurNote();
+    showSchedTitleDrop(false);
     openSheet("scheduleSheet");
     setTimeout(function(){ document.getElementById("schTitleInput").focus(); },260);
   }
@@ -3512,6 +3544,7 @@
     var title=document.getElementById("schTitleInput").value.trim();
     var time=document.getElementById("schTime").value||defaultTimeForType(type);
     var dur=Math.max(0,Math.round(num(document.getElementById("schDur").value)))||0;
+    if(title) addSchedTitle(title);
     if(editSchedId){
       var s=schedule.filter(function(x){return x.id===editSchedId;})[0];
       if(s){ s.day=day; s.weekStart=weekStart; s.type=type; s.title=title; s.time=time; s.dur=dur; }
@@ -3540,6 +3573,20 @@
   document.getElementById("schDelete").addEventListener("click", function(){
     if(!editSchedId) return;
     deleteSchedSession(editSchedId); closeSheets();
+  });
+  // saved-title dropdown: caret toggles, typing filters, tap to pick, × to remove
+  document.getElementById("schTitleCaret").addEventListener("click", function(){ showSchedTitleDrop(document.getElementById("schTitleDrop").hidden); });
+  document.getElementById("schTitleInput").addEventListener("input", function(){ showSchedTitleDrop(true); });
+  document.getElementById("schTitleDrop").addEventListener("click", function(e){
+    var del=e.target.closest("[data-title-del]");
+    if(del){ e.stopPropagation(); removeSchedTitle(del.getAttribute("data-title-del")); return; }
+    var opt=e.target.closest(".stt-name");
+    if(opt){ document.getElementById("schTitleInput").value=opt.getAttribute("data-title"); showSchedTitleDrop(false); return; }
+  });
+  document.addEventListener("click", function(e){
+    var wrap=document.querySelector(".sch-title-wrap"), drop=document.getElementById("schTitleDrop");
+    if(!wrap||!drop||drop.hidden) return;
+    if(!wrap.contains(e.target)) showSchedTitleDrop(false);
   });
 
   /* ---------- workout / gym ---------- */
@@ -5042,6 +5089,9 @@
     var bRaw=await sGet(BODY_KEY); if(bRaw){ try{ body=JSON.parse(bRaw); }catch(e){ body={}; } }
     var pRaw=await sGet(PROFILE_KEY); if(pRaw){ try{ profile=JSON.parse(pRaw); }catch(e){} }
     var scRaw=await sGet(SCHED_KEY); if(scRaw){ try{ schedule=JSON.parse(scRaw); }catch(e){ schedule=[]; } }
+    var stRaw=await sGet(SCHTITLES_KEY);
+    if(stRaw){ try{ schedTitles=JSON.parse(stRaw)||[]; }catch(e){ schedTitles=[]; } }
+    else { schedule.forEach(function(s){ if(s.title) addSchedTitle(s.title); }); }  // first run: seed from existing sessions
     var wRaw=await sGet(WORKOUT_KEY); if(wRaw){ try{ workouts=JSON.parse(wRaw); }catch(e){ workouts={}; } }
     var plRaw=await sGet(PLANS_KEY); if(plRaw){ try{ plans=JSON.parse(plRaw)||[]; }catch(e){ plans=[]; } } else { seedPlans(); }
     var exrRaw=await sGet(EXRENAMES_KEY); if(exrRaw){ try{ EX_RENAMES=JSON.parse(exrRaw)||{}; }catch(e){ EX_RENAMES={}; } }
