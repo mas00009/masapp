@@ -551,7 +551,12 @@
   #tab-plan .wday .wc.zero{color:var(--faint);font-weight:500}
   #tab-plan .day-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:9px;overflow:hidden}
   #tab-plan .day-card.today{border-color:color-mix(in srgb,var(--protein) 55%,var(--border))}
-  #tab-plan .day-head{display:flex;align-items:center;gap:9px;padding:11px 13px}
+  #tab-plan .day-head{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  #tab-plan .day-head:active{background:var(--surface-2)}
+  #tab-plan .day-chev{flex:none;width:13px;height:13px;color:var(--faint);display:grid;place-items:center;transition:transform .15s}
+  #tab-plan .day-chev svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  #tab-plan .day-card:not(.collapsed) .day-chev{transform:rotate(90deg)}
+  #tab-plan .day-card.collapsed .day-body{display:none}
   #tab-plan .day-head .dn{font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;flex:1}
   #tab-plan .day-card.today .day-head .dn{color:var(--protein)}
   #tab-plan .day-head .dtag{font-family:var(--ff-num);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--protein)}
@@ -615,7 +620,8 @@
   body.exc-reordering{-webkit-user-select:none;user-select:none}
   body.exc-reordering #tab-lift .exc{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   body.exc-reordering #tab-lift .exc-title{cursor:grabbing}
-  #tab-lift .exc-thumb{flex:0 0 auto;width:30px;height:30px;border-radius:7px;background:#fff;overflow:hidden;display:block}
+  #tab-lift .exc-thumb{flex:0 0 auto;width:30px;height:30px;border-radius:7px;background:#fff;overflow:hidden;display:block;cursor:pointer}
+  #tab-lift .exc-thumb:active{opacity:.7}
   #tab-lift .exc-thumb:empty{display:none}
   #tab-lift .exc-thumb img{width:100%;height:100%;object-fit:cover;display:block}
   #tab-lift .exc-head .en{flex:0 1 auto;max-width:58%;font-weight:600;font-size:12px;letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -3187,7 +3193,7 @@
   })();
 
   /* ---------- schedule / plan ---------- */
-  var SCHED_KEY="mt_schedule", schedule=[], editSchedId=null, planWeekOffset=0;
+  var SCHED_KEY="mt_schedule", schedule=[], editSchedId=null, planWeekOffset=0, planDayOpen={};
   var DAYS_FULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   var DAYS_SHORT=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   var MON_SHORT=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
@@ -3449,8 +3455,9 @@
           "<span class='ds-plus'>+</span></button>";
       }
       var rows=arr.map(sessRow).join("");
-      return "<div class='day-card"+(today?" today":"")+"'>"+
-        "<div class='day-head'><span class='dn'>"+name+"</span>"+
+      var open = (i in planDayOpen) ? planDayOpen[i] : today;   // default: only today expanded
+      return "<div class='day-card"+(today?" today":"")+(open?"":" collapsed")+"'>"+
+        "<div class='day-head' data-day-collapse='"+i+"'><span class='day-chev' aria-hidden='true'><svg viewBox='0 0 24 24'><polyline points='9 6 15 12 9 18'/></svg></span><span class='dn'>"+name+"</span>"+
         "<span class='dc'>"+arr.length+(arr.length===1?" session":" sessions")+"</span></div>"+
         "<div class='day-body'>"+rows+
         "<div class='add-row'><button class='add-btn' data-add-day='"+i+"'>+ Add session</button></div></div></div>";
@@ -3510,14 +3517,19 @@
     }
     saveSchedule(); renderPlan(); closeSheets();
   }
-  document.getElementById("planPrev").addEventListener("click", function(){ planWeekOffset--; renderPlan(); });
-  document.getElementById("planNext").addEventListener("click", function(){ planWeekOffset++; renderPlan(); });
+  document.getElementById("planPrev").addEventListener("click", function(){ planWeekOffset--; planDayOpen={}; renderPlan(); });
+  document.getElementById("planNext").addEventListener("click", function(){ planWeekOffset++; planDayOpen={}; renderPlan(); });
   document.getElementById("weekStrip").addEventListener("click",function(e){
     var b=e.target.closest("[data-add-day]"); if(b) openSchedule(null, parseInt(b.getAttribute("data-add-day"),10));
   });
   document.getElementById("planDays").addEventListener("click",function(e){
     var del=e.target.closest("[data-sess-del]");
     if(del){ e.stopPropagation(); deleteSchedSession(del.getAttribute("data-sess-del")); return; }
+    var dc=e.target.closest("[data-day-collapse]");
+    if(dc){ var di=parseInt(dc.getAttribute("data-day-collapse"),10);
+      var ti=todayIdx(), curOpen=(di in planDayOpen)?planDayOpen[di]:(planWeekOffset===0&&di===ti);
+      planDayOpen[di]=!curOpen;
+      var card=dc.closest(".day-card"); if(card) card.classList.toggle("collapsed", !planDayOpen[di]); return; }
     var add=e.target.closest("[data-add-day]"); if(add){ openSchedule(null, parseInt(add.getAttribute("data-add-day"),10)); return; }
     var se=e.target.closest("[data-sess]"); if(se){ openSchedule(se.getAttribute("data-sess")); }
   });
@@ -3645,7 +3657,7 @@
     var collapsed = isToday(wCurrent) ? !!collapsedExc[e.id] : !pastOpen[e.id];
     var thumb=exImg(e.name);
     return "<div class='exc"+(collapsed?" collapsed":"")+"' data-ex='"+e.id+"'>"+
-      "<div class='exc-head'><span class='exc-title' data-ex-collapse='"+e.id+"'><span class='exc-chev' aria-hidden='true'><svg viewBox='0 0 24 24'><polyline points='9 6 15 12 9 18'/></svg></span><span class='exc-thumb'>"+(thumb?"<img loading='lazy' src='"+thumb+"' alt=''>":"")+"</span><span class='en'>"+esc(e.name)+"</span>"+lastLine+"</span>"+pbBadge+
+      "<div class='exc-head'><span class='exc-thumb' data-form='"+encodeURIComponent(e.name)+"' role='button' tabindex='0' aria-label='View exercise animation'>"+(thumb?"<img loading='lazy' src='"+thumb+"' alt=''>":"")+"</span><span class='exc-title' data-ex-collapse='"+e.id+"'><span class='exc-chev' aria-hidden='true'><svg viewBox='0 0 24 24'><polyline points='9 6 15 12 9 18'/></svg></span><span class='en'>"+esc(e.name)+"</span>"+lastLine+"</span>"+pbBadge+
         "<button type='button' class='exc-mode' data-mode-cycle='"+e.id+"' aria-label='Change logging type' title='Logging type: tap to switch weights / bodyweight / time'>"+exModeLabel(e)+"</button>"+
         "<button type='button' class='exc-rest' data-rest-cycle aria-label='Rest timer length'>"+restDefault+"s</button>"+
         "<button class='set-add' data-add-set='"+e.id+"' aria-label='Add set'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12 6v12M6 12h12'/></svg></button>"+
