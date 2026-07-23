@@ -579,13 +579,17 @@
   #tab-plan .sess{display:flex;align-items:center;gap:10px;padding:9px 7px;border-top:1px solid var(--border);cursor:pointer}
   #tab-plan .sess:active{background:var(--surface-2)}
   #tab-plan .sess .bar{width:3px;align-self:stretch;border-radius:2px;flex:none;min-height:26px}
-  #tab-plan .sess .stimew{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:52px;flex:none}
+  #tab-plan .sess .stimew{display:flex;flex-direction:row;align-items:baseline;gap:6px;flex:none}
+  #tab-plan .sess .stimew{position:relative;flex:none;min-width:52px}
   #tab-plan .sess .stime{font-family:var(--ff-num);font-size:12px;font-weight:700;color:var(--text);white-space:nowrap}
   #tab-plan .sess .stime.none{color:var(--faint);font-weight:500}
-  #tab-plan .sess .sdur{font-family:var(--ff-num);font-size:10px;font-weight:600;color:var(--faint);white-space:nowrap;letter-spacing:.02em}
+  #tab-plan .sess .sdur{position:absolute;top:100%;left:0;margin-top:1px;font-family:var(--ff-num);font-size:8.5px;font-weight:600;color:var(--faint);white-space:nowrap;letter-spacing:.02em;line-height:1}
   #tab-plan .sess .sdur.actual{color:var(--blue)}
-  #tab-plan .sess .sinfo{flex:1;min-width:0}
-  #tab-plan .sess .stitle{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #tab-plan .sess .sinfo{flex:0 1 auto;min-width:0;overflow:hidden}
+  #tab-plan .sess .stitle{display:block;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:16px}
+  #tab-plan .sess .stime{line-height:16px}
+  #tab-plan .sess .schip,#tab-plan .sess .sess-del{align-self:center}
+  #tab-plan .sess .schip{margin-left:auto}
   #tab-plan .sess .snote{font-family:var(--ff-num);font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #tab-plan .sess .schip{font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;padding:3px 7px;border-radius:6px;flex:none}
   #tab-plan .sess .sess-del{flex:none;width:28px;height:28px;border:none;background:transparent;color:var(--faint);font-size:20px;line-height:1;cursor:pointer;border-radius:8px;display:grid;place-items:center;margin:-2px -2px -2px 0;-webkit-tap-highlight-color:transparent}
@@ -3274,7 +3278,7 @@
   ];
   var STYPE_DEFAULT_TIME={gym:"14:00",basketball:"19:30",swimming:"14:00"};
   function defaultTimeForType(t){ return STYPE_DEFAULT_TIME[t] || STYPE_DEFAULT_TIME.gym; }
-  var STYPE_DEFAULT_DUR={gym:60,basketball:90,swimming:45};
+  var STYPE_DEFAULT_DUR={gym:60,basketball:120,swimming:45};
   function defaultDurForType(t){ return STYPE_DEFAULT_DUR[t]!=null ? STYPE_DEFAULT_DUR[t] : 60; }
   // Actual tracked duration of the gym workout on a given date, if any.
   function schedGymActualDur(dateKey){ var w=workouts[dateKey]; return w ? wkDurationMin(w) : 0; }
@@ -3457,10 +3461,8 @@
     var eff=schedEffectiveDur(s), durTxt=eff.min>0?fmtDur(eff.min):"";
     return "<div class='sess' data-sess='"+s.id+"'>"+
       "<span class='bar' style='background:"+meta.color+"'></span>"+
-      "<span class='stimew'>"+
-        "<span class='stime"+(s.time?"":" none")+"'>"+(s.time?esc(fmtSchedTime(s.time)):"\u2014")+"</span>"+
-        (durTxt?"<span class='sdur"+(eff.actual?" actual":"")+"'>"+esc(durTxt)+"</span>":"")+
-      "</span>"+
+      "<span class='stimew'><span class='stime"+(s.time?"":" none")+"'>"+(s.time?esc(fmtSchedTime(s.time)):"\u2014")+"</span>"+
+        (durTxt?"<span class='sdur"+(eff.actual?" actual":"")+"'>"+esc(durTxt)+"</span>":"")+"</span>"+
       "<span class='sinfo'><span class='stitle'>"+esc(title)+"</span>"+
       (subtitle?"<span class='snote'>"+esc(subtitle)+"</span>":"")+"</span>"+
       "<span class='schip' style='"+chip+"'>"+esc(meta.label)+"</span>"+
